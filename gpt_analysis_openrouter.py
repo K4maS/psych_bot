@@ -1,0 +1,55 @@
+import httpx
+import logging
+from config import OPENROUTER_API_KEY
+from sheets import get_prompt_from_sheet
+
+logging.basicConfig(filename="errors.log", level=logging.ERROR)
+
+MODELS = [
+    "openai/gpt-4o",
+    "openai/gpt-3.5-turbo",
+    "deepseek-ai/deepseek-coder",
+    "google/gemini-pro",
+    "mistralai/mistral-7b-instruct",
+]
+
+API_URL = "https://openrouter.ai/api/v1/chat/completions"
+HEADERS = {
+    "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://yourproject.com",  # заменить при необходимости
+    "X-Title": "PsychologyBot",
+}
+
+def call_gpt(message_1, message_2):
+    prompt_prefix = get_prompt_from_sheet() or (
+        "Ты профессиональный психолог. Проанализируй сообщения двух партнёров и составь краткое резюме для психолога, используя научно обоснованные подходы."
+    )
+
+    messages = [
+        {"role": "system", "content": prompt_prefix},
+        {"role": "user", "content": f"Партнёр 1: {message_1}\n\nПартнёр 2: {message_2}"}
+    ]
+
+    for model in MODELS:
+        try:
+            response = httpx.post(API_URL, headers=HEADERS, json={
+                "model": model,
+                "messages": messages,
+                "temperature": 0.7,
+                "max_tokens": 1000,
+            })
+
+            if response.status_code == 200:
+                data = response.json()
+                result = data["choices"][0]["message"]["content"]
+                print(f"[GPT] Использована модель: {model}")
+                return result
+            else:
+                raise Exception(f"Код: {response.status_code} | {response.text}")
+
+        except Exception as e:
+            logging.error(f"[GPT] Ошибка с моделью {model}: {e}")
+            print(f"[GPT] Ошибка модели {model}: {e}")
+
+    return "Ошибка: ни одна модель GPT не сработала."
