@@ -1,0 +1,7 @@
+TELEGRAM_BOT_TOKEN = "ELEGRAM_BOT_TOKEN"
+OPENAI_API_KEY = "OPENAI_API_KEY"
+OPENROUTER_API_KEY = "OPENROUTER_API_KEY"
+GOOGLE_CREDENTIALS_JSON = "pairpsyhologybot.json"  # OAuth файл
+SHEET_NAME = "Sheet1"
+PROMPT_SHEET_NAME = "Prompt"
+spreadsheet_id = "spreadsheet_id"
