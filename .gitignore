@@ -1,4 +1,5 @@
 config.py
 *.log
 pairpsyhologybot-*.json
+__pycache__
 *.json
