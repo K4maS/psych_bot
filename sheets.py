@@ -5,8 +5,8 @@ import logging
 
 logging.basicConfig(filename="errors.log", level=logging.ERROR)
 
-ZERO, CODE, UID_1, MESSAGE_1, USER1_ANALYSIS, UID_2, MESSAGE_2, USER2_ANALYSIS, SYMMARY = range(9)
-print(CODE, UID_1, MESSAGE_1, USER1_ANALYSIS, UID_2, MESSAGE_2, USER2_ANALYSIS, SYMMARY)
+ZERO, CODE, UID_1, MESSAGE_1, USER1_ANALYSIS, UID_2, MESSAGE_2, USER2_ANALYSIS, SYMMARY, RECOMENDATION, RECOMENDATION_TO_A_PSYHOLOGIST = range(11)
+
 
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
 
@@ -66,10 +66,25 @@ def read_messages(row):
         logging.error(f"[GoogleSheets] Ошибка чтения сообщений: {e}")
         raise
 
-def write_summary(row, summary):
+def write_to_cell(row, column, value):
     sheet = get_worksheet()
     try:
-        sheet.update_cell(row, SYMMARY, summary)
+        sheet.update_cell(row, column, value)
     except Exception as e:
         logging.error(f"[GoogleSheets] Ошибка записи summary: {e}")
         raise
+
+def write_summary(row, value):
+    write_to_cell(row, SYMMARY, value)
+    
+def write_user1_analysis(row, value):
+    write_to_cell(row, USER1_ANALYSIS, value)
+    
+def write_user2_analysis(row, value):
+    write_to_cell(row, USER2_ANALYSIS, value)
+    
+def write_recommendation(row, value):
+    write_to_cell(row, RECOMENDATION, value)
+    
+def write_recommendation_to_apsychologist(row, value):
+    write_to_cell(row, RECOMENDATION_TO_A_PSYHOLOGIST, value)
