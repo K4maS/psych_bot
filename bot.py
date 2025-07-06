@@ -46,14 +46,12 @@ async def question_answer_base(update: Update, contex: ContextTypes.DEFAULT_TYPE
     row = session["row"]
     message = update.message.text.strip()
     users_answers[question_index] = message
-    print(users_answers, question_index)
     
     
 
     try:
         next_question = questions[question_index + 1]['question']
         await update.message.reply_text(next_question,  reply_markup=reply_markup2)
-        print(f"Задан вопрос {next_question}" )
 
         if 'component' in questions[question_index + 1] or len(questions) <= question_index:
             return questions[question_index + 1]['component']

@@ -31,8 +31,7 @@ def call_gpt(value, extra_prefix):
         {"role": "system", "content": f"{prompt_prefix}.\n\n{extra_prefix}"},
         {"role": "user", "content": f"{value}"}
     ]
-    
-    print('prompt_prefix', messages)
+
     
  
     for model in MODELS:
