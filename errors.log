@@ -1732,3 +1732,702 @@ Traceback (most recent call last):
     await update.message.reply_text(questions[0].question, reply_markup=reply_markup2)
                                     ^^^^^^^^^^^^^^^^^^^^^
 AttributeError: 'dict' object has no attribute 'question'
+ERROR:telegram.ext.Application:No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_application.py", line 1264, in process_update
+    await coroutine
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\conversationhandler.py", line 857, in handle_update
+    new_state: object = await handler.handle_update(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        update, application, handler_check_result, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 72, in question_answer7
+    return await question_answer1(update, contex, 6)
+                 ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+TypeError: question_answer1() takes 2 positional arguments but 3 were given
+ERROR:telegram.ext.Application:No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_application.py", line 1264, in process_update
+    await coroutine
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\conversationhandler.py", line 857, in handle_update
+    new_state: object = await handler.handle_update(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        update, application, handler_check_result, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 72, in question_answer7
+    return await question_answer_base(update, contex, 6)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 42, in question_answer_base
+    users_answers[question_index] = message
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+IndexError: list assignment index out of range
+ERROR:telegram.ext.Application:No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_application.py", line 1264, in process_update
+    await coroutine
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\conversationhandler.py", line 857, in handle_update
+    new_state: object = await handler.handle_update(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        update, application, handler_check_result, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 54, in question_answer1
+    return await question_answer_base(update, contex, 0)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 42, in question_answer_base
+    users_answers[question_index] = message
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+IndexError: list assignment index out of range
+ERROR:telegram.ext.Application:No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_application.py", line 1264, in process_update
+    await coroutine
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\conversationhandler.py", line 857, in handle_update
+    new_state: object = await handler.handle_update(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        update, application, handler_check_result, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 55, in question_answer1
+    return await question_answer_base(update, contex, 0)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 43, in question_answer_base
+    users_answers[question_index] = message
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+IndexError: list assignment index out of range
+ERROR:telegram.ext.Application:No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_application.py", line 1264, in process_update
+    await coroutine
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\conversationhandler.py", line 857, in handle_update
+    new_state: object = await handler.handle_update(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        update, application, handler_check_result, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 55, in question_answer1
+    return await question_answer_base(update, contex, 0)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 43, in question_answer_base
+    users_answers[question_index] = message
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+IndexError: list assignment index out of range
+ERROR:telegram.ext.Application:No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_application.py", line 1264, in process_update
+    await coroutine
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\conversationhandler.py", line 857, in handle_update
+    new_state: object = await handler.handle_update(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        update, application, handler_check_result, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 55, in question_answer1
+    return await question_answer_base(update, contex, 0)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 45, in question_answer_base
+    await update.message.reply_text(questions[question_index - 1]['question'],  reply_markup=reply_markup2())
+                                                                                             ~~~~~~~~~~~~~^^
+TypeError: 'ReplyKeyboardMarkup' object is not callable
+ERROR:telegram.ext.Application:No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_application.py", line 1264, in process_update
+    await coroutine
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\conversationhandler.py", line 857, in handle_update
+    new_state: object = await handler.handle_update(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        update, application, handler_check_result, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 55, in question_answer1
+    return await question_answer_base(update, contex, 0)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 45, in question_answer_base
+    await update.message.reply_text(questions[question_index - 1]['question'],  reply_markup=reply_markup2())
+                                                                                             ~~~~~~~~~~~~~^^
+TypeError: 'ReplyKeyboardMarkup' object is not callable
+ERROR:telegram.ext.Application:No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_application.py", line 1264, in process_update
+    await coroutine
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\conversationhandler.py", line 857, in handle_update
+    new_state: object = await handler.handle_update(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        update, application, handler_check_result, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 55, in question_answer1
+    return await question_answer_base(update, contex, 0)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 45, in question_answer_base
+    await update.message.reply_text(questions[question_index - 1]['question'],  reply_markup=reply_markup2())
+                                                                                             ~~~~~~~~~~~~~^^
+TypeError: 'ReplyKeyboardMarkup' object is not callable
+ERROR:telegram.ext.Application:No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_application.py", line 1264, in process_update
+    await coroutine
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\conversationhandler.py", line 857, in handle_update
+    new_state: object = await handler.handle_update(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        update, application, handler_check_result, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 55, in question_answer1
+    return await question_answer_base(update, contex, 0)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 45, in question_answer_base
+    await update.message.reply_text(questions[question_index + 1]['question'],  reply_markup=reply_markup2())
+                                                                                             ~~~~~~~~~~~~~^^
+TypeError: 'ReplyKeyboardMarkup' object is not callable
+ERROR:telegram.ext.Application:No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_application.py", line 1264, in process_update
+    await coroutine
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\conversationhandler.py", line 857, in handle_update
+    new_state: object = await handler.handle_update(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        update, application, handler_check_result, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 55, in question_answer1
+    return await question_answer_base(update, contex, 0)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 45, in question_answer_base
+    await update.message.reply_text(questions[question_index + 1]['question'],  reply_markup=reply_markup2())
+                                                                                             ~~~~~~~~~~~~~^^
+TypeError: 'ReplyKeyboardMarkup' object is not callable
+ERROR:telegram.ext.Application:No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_application.py", line 1264, in process_update
+    await coroutine
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\conversationhandler.py", line 857, in handle_update
+    new_state: object = await handler.handle_update(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        update, application, handler_check_result, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 55, in question_answer1
+    return await question_answer_base(update, contex, 0)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 44, in question_answer_base
+    await update.message.reply_text(questions[question_index + 1]['question'],  reply_markup=reply_markup2())
+                                                                                             ~~~~~~~~~~~~~^^
+TypeError: 'ReplyKeyboardMarkup' object is not callable
+ERROR:telegram.ext.Application:No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_application.py", line 1264, in process_update
+    await coroutine
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\conversationhandler.py", line 857, in handle_update
+    new_state: object = await handler.handle_update(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        update, application, handler_check_result, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 62, in question_answer1
+    return await question_answer_base(update, contex, 0)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 46, in question_answer_base
+    await update.message.reply_text(next_question,  reply_markup=reply_markup2())
+                                                                 ~~~~~~~~~~~~~^^
+TypeError: 'ReplyKeyboardMarkup' object is not callable
+ERROR:telegram.ext.Application:No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_application.py", line 1264, in process_update
+    await coroutine
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\conversationhandler.py", line 857, in handle_update
+    new_state: object = await handler.handle_update(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        update, application, handler_check_result, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 62, in question_answer1
+    return await question_answer_base(update, contex, 0)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 49, in question_answer_base
+    if 'component' in questions[question_intex + 1]:
+                                ^^^^^^^^^^^^^^
+NameError: name 'question_intex' is not defined. Did you mean: 'question_index'?
+ERROR:telegram.ext.Application:No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_application.py", line 1264, in process_update
+    await coroutine
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\conversationhandler.py", line 857, in handle_update
+    new_state: object = await handler.handle_update(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        update, application, handler_check_result, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 62, in question_answer1
+    return await question_answer_base(update, contex, 0)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 49, in question_answer_base
+    if 'component' in questions[question_intex + 1]:
+                                ^^^^^^^^^^^^^^
+NameError: name 'question_intex' is not defined. Did you mean: 'question_index'?
+ERROR:telegram.ext.Application:No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_application.py", line 1264, in process_update
+    await coroutine
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\conversationhandler.py", line 857, in handle_update
+    new_state: object = await handler.handle_update(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        update, application, handler_check_result, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 62, in question_answer1
+    return await question_answer_base(update, contex, 0)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 49, in question_answer_base
+    if 'component' in questions[question_intex + 1]:
+                                ^^^^^^^^^^^^^^
+NameError: name 'question_intex' is not defined. Did you mean: 'question_index'?
+ERROR:telegram.ext.Application:No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_application.py", line 1264, in process_update
+    await coroutine
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\conversationhandler.py", line 857, in handle_update
+    new_state: object = await handler.handle_update(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        update, application, handler_check_result, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 62, in question_answer1
+    return await question_answer_base(update, contex, 0)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 49, in question_answer_base
+    if 'component' in questions[question_intex + 1]:
+                                ^^^^^^^^^^^^^^
+NameError: name 'question_intex' is not defined. Did you mean: 'question_index'?
+ERROR:telegram.ext.Application:No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_application.py", line 1264, in process_update
+    await coroutine
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\conversationhandler.py", line 857, in handle_update
+    new_state: object = await handler.handle_update(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        update, application, handler_check_result, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 62, in question_answer1
+    return await question_answer_base(update, contex, 0)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 49, in question_answer_base
+    if 'component' in questions[question_intex + 1]:
+                                ^^^^^^^^^^^^^^
+NameError: name 'question_intex' is not defined. Did you mean: 'question_index'?
+ERROR:telegram.ext.Application:No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_application.py", line 1264, in process_update
+    await coroutine
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\conversationhandler.py", line 857, in handle_update
+    new_state: object = await handler.handle_update(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        update, application, handler_check_result, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 63, in question_answer1
+    return await question_answer_base(update, contex, 0)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 50, in question_answer_base
+    if 'component' in questions[question_intex + 1]:
+                                ^^^^^^^^^^^^^^
+NameError: name 'question_intex' is not defined. Did you mean: 'question_index'?
+ERROR:telegram.ext.Application:No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_application.py", line 1264, in process_update
+    await coroutine
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\conversationhandler.py", line 857, in handle_update
+    new_state: object = await handler.handle_update(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        update, application, handler_check_result, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 63, in question_answer1
+    return await question_answer_base(update, contex, 0)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 50, in question_answer_base
+    if 'component' in questions[question_intex + 1]:
+                                ^^^^^^^^^^^^^^
+NameError: name 'question_intex' is not defined. Did you mean: 'question_index'?
+ERROR:asyncio:Task was destroyed but it is pending!
+task: <Task pending name='Application:7561052858:update_fetcher' coro=<Application._update_fetcher() running at C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_application.py:1179> wait_for=<Future pending cb=[Task.task_wakeup()]>>
+ERROR:telegram.ext.Application:No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_application.py", line 1264, in process_update
+    await coroutine
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\conversationhandler.py", line 857, in handle_update
+    new_state: object = await handler.handle_update(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        update, application, handler_check_result, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 80, in question_answer7
+    return await question_answer_base(update, contex, 6)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 55, in question_answer_base
+    return MSG_1
+           ^^^^^
+NameError: name 'MSG_1' is not defined
+ERROR:telegram.ext.Application:No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_application.py", line 1264, in process_update
+    await coroutine
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\conversationhandler.py", line 857, in handle_update
+    new_state: object = await handler.handle_update(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        update, application, handler_check_result, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 80, in question_answer7
+    return await question_answer_base(update, contex, 6)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 55, in question_answer_base
+    return MSG_1
+           ^^^^^
+NameError: name 'MSG_1' is not defined
+ERROR:telegram.ext.Application:No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_application.py", line 1264, in process_update
+    await coroutine
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\conversationhandler.py", line 857, in handle_update
+    new_state: object = await handler.handle_update(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        update, application, handler_check_result, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 80, in question_answer7
+    return await question_answer_base(update, contex, 6)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 55, in question_answer_base
+    return MSG_1
+           ^^^^^
+NameError: name 'MSG_1' is not defined
+ERROR:telegram.ext.Application:No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_application.py", line 1264, in process_update
+    await coroutine
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\conversationhandler.py", line 857, in handle_update
+    new_state: object = await handler.handle_update(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        update, application, handler_check_result, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 65, in question_answer1
+    return await question_answer_base(update, contex, 0)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 61, in question_answer_base
+    return MSG_1
+           ^^^^^
+NameError: name 'MSG_1' is not defined
+ERROR:telegram.ext.Application:No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_application.py", line 1264, in process_update
+    await coroutine
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\conversationhandler.py", line 857, in handle_update
+    new_state: object = await handler.handle_update(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        update, application, handler_check_result, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 65, in question_answer1
+    return await question_answer_base(update, contex, 0)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 61, in question_answer_base
+    return MSG_1
+           ^^^^^
+NameError: name 'MSG_1' is not defined
+ERROR:telegram.ext.Application:No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_application.py", line 1264, in process_update
+    await coroutine
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\conversationhandler.py", line 857, in handle_update
+    new_state: object = await handler.handle_update(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        update, application, handler_check_result, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 65, in question_answer1
+    return await question_answer_base(update, contex, 0)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 61, in question_answer_base
+    return MSG_1
+           ^^^^^
+NameError: name 'MSG_1' is not defined
+ERROR:telegram.ext.Application:No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_application.py", line 1264, in process_update
+    await coroutine
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\conversationhandler.py", line 857, in handle_update
+    new_state: object = await handler.handle_update(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        update, application, handler_check_result, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 65, in question_answer1
+    return await question_answer_base(update, contex, 0)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 61, in question_answer_base
+    return MSG_1
+           ^^^^^
+NameError: name 'MSG_1' is not defined
+ERROR:telegram.ext.Application:No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_application.py", line 1264, in process_update
+    await coroutine
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\conversationhandler.py", line 857, in handle_update
+    new_state: object = await handler.handle_update(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        update, application, handler_check_result, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 71, in question_answer1
+    return await question_answer_base(update, contex, 0)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 51, in question_answer_base
+    uid_1, msg_1, uid_2, msg_2 = read_messages(row)
+                                               ^^^
+NameError: name 'row' is not defined. Did you mean: 'pow'?
+ERROR:telegram.ext.Application:No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_application.py", line 1264, in process_update
+    await coroutine
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\conversationhandler.py", line 857, in handle_update
+    new_state: object = await handler.handle_update(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        update, application, handler_check_result, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 70, in question_answer1
+    return await question_answer_base(update, contex, 0)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 51, in question_answer_base
+    uid_1, msg_1, uid_2, msg_2 = read_messages(row)
+                                               ^^^
+NameError: name 'row' is not defined. Did you mean: 'pow'?
+ERROR:root:[GoogleSheets] Ошибка открытия листа Sheet1: {'code': 429, 'message': "Quota exceeded for quota metric 'Read requests' and limit 'Read requests per minute per user' of service 'sheets.googleapis.com' for consumer 'project_number:733402705207'.", 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.ErrorInfo', 'reason': 'RATE_LIMIT_EXCEEDED', 'domain': 'googleapis.com', 'metadata': {'consumer': 'projects/733402705207', 'quota_limit_value': '60', 'quota_limit': 'ReadRequestsPerMinutePerUser', 'quota_metric': 'sheets.googleapis.com/read_requests', 'service': 'sheets.googleapis.com', 'quota_unit': '1/min/{project}/{user}', 'quota_location': 'global'}}, {'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Request a higher quota limit.', 'url': 'https://cloud.google.com/docs/quotas/help/request_increase'}]}]}
+ERROR:telegram.ext.Application:No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_application.py", line 1264, in process_update
+    await coroutine
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\conversationhandler.py", line 857, in handle_update
+    new_state: object = await handler.handle_update(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        update, application, handler_check_result, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 76, in question_answer3
+    return await question_answer_base(update, contex, 2)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 51, in question_answer_base
+    uid_1, msg_1, uid_2, msg_2 = read_messages(row)
+                                 ~~~~~~~~~~~~~^^^^^
+  File "D:\Frontend\telegram\psych_bot\sheets.py", line 58, in read_messages
+    sheet = get_worksheet()
+  File "D:\Frontend\telegram\psych_bot\sheets.py", line 18, in get_worksheet
+    sheet = client.open_by_key(spreadsheet_id).worksheet(sheet_name)
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\gspread\spreadsheet.py", line 341, in worksheet
+    sheet_data = self.fetch_sheet_metadata()
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\gspread\spreadsheet.py", line 247, in fetch_sheet_metadata
+    r = self.client.request("get", url, params=params)
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\gspread\client.py", line 93, in request
+    raise APIError(response)
+gspread.exceptions.APIError: {'code': 429, 'message': "Quota exceeded for quota metric 'Read requests' and limit 'Read requests per minute per user' of service 'sheets.googleapis.com' for consumer 'project_number:733402705207'.", 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.ErrorInfo', 'reason': 'RATE_LIMIT_EXCEEDED', 'domain': 'googleapis.com', 'metadata': {'consumer': 'projects/733402705207', 'quota_limit_value': '60', 'quota_limit': 'ReadRequestsPerMinutePerUser', 'quota_metric': 'sheets.googleapis.com/read_requests', 'service': 'sheets.googleapis.com', 'quota_unit': '1/min/{project}/{user}', 'quota_location': 'global'}}, {'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Request a higher quota limit.', 'url': 'https://cloud.google.com/docs/quotas/help/request_increase'}]}]}
+ERROR:root:[GoogleSheets] Ошибка открытия листа Sheet1: {'code': 429, 'message': "Quota exceeded for quota metric 'Read requests' and limit 'Read requests per minute per user' of service 'sheets.googleapis.com' for consumer 'project_number:733402705207'.", 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.ErrorInfo', 'reason': 'RATE_LIMIT_EXCEEDED', 'domain': 'googleapis.com', 'metadata': {'consumer': 'projects/733402705207', 'quota_limit_value': '60', 'quota_limit': 'ReadRequestsPerMinutePerUser', 'quota_metric': 'sheets.googleapis.com/read_requests', 'service': 'sheets.googleapis.com', 'quota_unit': '1/min/{project}/{user}', 'quota_location': 'global'}}, {'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Request a higher quota limit.', 'url': 'https://cloud.google.com/docs/quotas/help/request_increase'}]}]}
+ERROR:telegram.ext.Application:No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_application.py", line 1264, in process_update
+    await coroutine
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\conversationhandler.py", line 857, in handle_update
+    new_state: object = await handler.handle_update(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        update, application, handler_check_result, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 76, in question_answer3
+    return await question_answer_base(update, contex, 2)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 51, in question_answer_base
+    uid_1, msg_1, uid_2, msg_2 = read_messages(row)
+                                 ~~~~~~~~~~~~~^^^^^
+  File "D:\Frontend\telegram\psych_bot\sheets.py", line 58, in read_messages
+    sheet = get_worksheet()
+  File "D:\Frontend\telegram\psych_bot\sheets.py", line 18, in get_worksheet
+    sheet = client.open_by_key(spreadsheet_id).worksheet(sheet_name)
+            ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\gspread\client.py", line 212, in open_by_key
+    raise ex
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\gspread\client.py", line 206, in open_by_key
+    spreadsheet = Spreadsheet(self, {"id": key})
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\gspread\spreadsheet.py", line 37, in __init__
+    metadata = self.fetch_sheet_metadata()
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\gspread\spreadsheet.py", line 247, in fetch_sheet_metadata
+    r = self.client.request("get", url, params=params)
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\gspread\client.py", line 93, in request
+    raise APIError(response)
+gspread.exceptions.APIError: {'code': 429, 'message': "Quota exceeded for quota metric 'Read requests' and limit 'Read requests per minute per user' of service 'sheets.googleapis.com' for consumer 'project_number:733402705207'.", 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.ErrorInfo', 'reason': 'RATE_LIMIT_EXCEEDED', 'domain': 'googleapis.com', 'metadata': {'consumer': 'projects/733402705207', 'quota_limit_value': '60', 'quota_limit': 'ReadRequestsPerMinutePerUser', 'quota_metric': 'sheets.googleapis.com/read_requests', 'service': 'sheets.googleapis.com', 'quota_unit': '1/min/{project}/{user}', 'quota_location': 'global'}}, {'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Request a higher quota limit.', 'url': 'https://cloud.google.com/docs/quotas/help/request_increase'}]}]}
+ERROR:root:[GPT] Ошибка с моделью openai/gpt-4o: Код: 402 | {"error":{"message":"This request requires more credits, or fewer max_tokens. You requested up to 1000 tokens, but can only afford 951. To increase, visit https://openrouter.ai/settings/credits and upgrade to a paid account","code":402,"metadata":{"provider_name":null}},"user_id":"user_2yEbVfDzUm3gZaKSeuRlPbqvTju"}
+ERROR:root:[GPT] Ошибка с моделью openai/gpt-3.5-turbo: Код: 404 | {"error":{"message":"No endpoints found for openai/gpt-3.5-turbo.","code":404},"user_id":"user_2yEbVfDzUm3gZaKSeuRlPbqvTju"}
+ERROR:root:[GPT] Ошибка с моделью deepseek-ai/deepseek-coder: Код: 400 | {"error":{"message":"deepseek-ai/deepseek-coder is not a valid model ID","code":400},"user_id":"user_2yEbVfDzUm3gZaKSeuRlPbqvTju"}
+ERROR:root:[GPT] Ошибка с моделью google/gemini-pro: Код: 400 | {"error":{"message":"google/gemini-pro is not a valid model ID","code":400},"user_id":"user_2yEbVfDzUm3gZaKSeuRlPbqvTju"}
+ERROR:root:[GoogleSheets] Ошибка открытия листа Sheet1: {'code': 429, 'message': "Quota exceeded for quota metric 'Read requests' and limit 'Read requests per minute per user' of service 'sheets.googleapis.com' for consumer 'project_number:733402705207'.", 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.ErrorInfo', 'reason': 'RATE_LIMIT_EXCEEDED', 'domain': 'googleapis.com', 'metadata': {'consumer': 'projects/733402705207', 'quota_limit_value': '60', 'quota_unit': '1/min/{project}/{user}', 'service': 'sheets.googleapis.com', 'quota_limit': 'ReadRequestsPerMinutePerUser', 'quota_location': 'global', 'quota_metric': 'sheets.googleapis.com/read_requests'}}, {'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Request a higher quota limit.', 'url': 'https://cloud.google.com/docs/quotas/help/request_increase'}]}]}
+ERROR:root:[BOT] Ошибка анализа: {'code': 429, 'message': "Quota exceeded for quota metric 'Read requests' and limit 'Read requests per minute per user' of service 'sheets.googleapis.com' for consumer 'project_number:733402705207'.", 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.ErrorInfo', 'reason': 'RATE_LIMIT_EXCEEDED', 'domain': 'googleapis.com', 'metadata': {'consumer': 'projects/733402705207', 'quota_limit_value': '60', 'quota_unit': '1/min/{project}/{user}', 'service': 'sheets.googleapis.com', 'quota_limit': 'ReadRequestsPerMinutePerUser', 'quota_location': 'global', 'quota_metric': 'sheets.googleapis.com/read_requests'}}, {'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Request a higher quota limit.', 'url': 'https://cloud.google.com/docs/quotas/help/request_increase'}]}]}
+ERROR:root:[GoogleSheets] Ошибка чтения сообщений: {'code': 429, 'message': "Quota exceeded for quota metric 'Read requests' and limit 'Read requests per minute per user' of service 'sheets.googleapis.com' for consumer 'project_number:733402705207'.", 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.ErrorInfo', 'reason': 'RATE_LIMIT_EXCEEDED', 'domain': 'googleapis.com', 'metadata': {'quota_unit': '1/min/{project}/{user}', 'quota_limit_value': '60', 'quota_limit': 'ReadRequestsPerMinutePerUser', 'consumer': 'projects/733402705207', 'quota_location': 'global', 'service': 'sheets.googleapis.com', 'quota_metric': 'sheets.googleapis.com/read_requests'}}, {'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Request a higher quota limit.', 'url': 'https://cloud.google.com/docs/quotas/help/request_increase'}]}]}
+ERROR:telegram.ext.Application:No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_application.py", line 1264, in process_update
+    await coroutine
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\conversationhandler.py", line 857, in handle_update
+    new_state: object = await handler.handle_update(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        update, application, handler_check_result, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\telegram\ext\_handlers\basehandler.py", line 157, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 70, in question_answer1
+    return await question_answer_base(update, contex, 0)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Frontend\telegram\psych_bot\bot.py", line 51, in question_answer_base
+    uid_1, msg_1, uid_2, msg_2 = read_messages(row)
+                                 ~~~~~~~~~~~~~^^^^^
+  File "D:\Frontend\telegram\psych_bot\sheets.py", line 60, in read_messages
+    uid_1 = sheet.cell(row, UID_1).value
+            ~~~~~~~~~~^^^^^^^^^^^^
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\gspread\worksheet.py", line 281, in cell
+    data = self.get(
+        rowcol_to_a1(row, col), value_render_option=value_render_option
+    )
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\gspread\utils.py", line 739, in wrapper
+    return f(*args, **kwargs)
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\gspread\worksheet.py", line 1027, in get
+    response = self.spreadsheet.values_get(range_name, params=params)
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\gspread\spreadsheet.py", line 175, in values_get
+    r = self.client.request("get", url, params=params)
+  File "C:\Users\Kamil\AppData\Roaming\Python\Python313\site-packages\gspread\client.py", line 93, in request
+    raise APIError(response)
+gspread.exceptions.APIError: {'code': 429, 'message': "Quota exceeded for quota metric 'Read requests' and limit 'Read requests per minute per user' of service 'sheets.googleapis.com' for consumer 'project_number:733402705207'.", 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.ErrorInfo', 'reason': 'RATE_LIMIT_EXCEEDED', 'domain': 'googleapis.com', 'metadata': {'quota_unit': '1/min/{project}/{user}', 'quota_limit_value': '60', 'quota_limit': 'ReadRequestsPerMinutePerUser', 'consumer': 'projects/733402705207', 'quota_location': 'global', 'service': 'sheets.googleapis.com', 'quota_metric': 'sheets.googleapis.com/read_requests'}}, {'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Request a higher quota limit.', 'url': 'https://cloud.google.com/docs/quotas/help/request_increase'}]}]}
