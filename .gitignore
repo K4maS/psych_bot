@@ -1,0 +1,2 @@
+git rm --cached config.py
+git rm --cached credentials.json
