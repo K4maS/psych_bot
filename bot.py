@@ -48,7 +48,7 @@ async def question_answer_base(update: Update, contex: ContextTypes.DEFAULT_TYPE
     users_answers[question_index] = message
     print(users_answers, question_index)
     
-    uid_1, msg_1, uid_2, msg_2 = read_messages(row)
+    
 
     try:
         next_question = questions[question_index + 1]['question']
@@ -56,14 +56,15 @@ async def question_answer_base(update: Update, contex: ContextTypes.DEFAULT_TYPE
         print(f"Задан вопрос {next_question}" )
 
         if 'component' in questions[question_index + 1] or len(questions) <= question_index:
-            return questions[question_index + 1]['component'] 
-
+            return questions[question_index + 1]['component']
+        uid_1, msg_1, uid_2, msg_2 = read_messages(row)
+            if msg_1 and uid_1 and session["device"] == "one":
+                return  STEP_MSG2
+            return  STEP_MSG1
     except IndexError:
         await update.message.reply_text("Опишите ваши проблемы:")
         
-    if msg_1 and uid_1 and session["device"] == "one":
-         return  STEP_MSG2
-    return  STEP_MSG1
+    
 
 async def question_answer1(update: Update, contex: ContextTypes.DEFAULT_TYPE):
     users_answers = [None] *  len(questions)
