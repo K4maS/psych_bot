@@ -7,7 +7,7 @@ from gpt_analysis_openrouter import call_gpt
 
 logging.basicConfig(filename="errors.log", level=logging.ERROR)
 
-STEP_CODE, Q_START, Q_1, Q_2, Q_3, Q_4, Q_5, Q_6, Q_7, STEP_DEVICE, STEP_MSG1, STEP_MSG2, STEP_END = range(13)
+STEP_CODE,STEP_DEVICE, STEP_MSG1, STEP_MSG2, STEP_END = range(5)
 
 user_sessions = {}  # user_id: {code, row, device, is_first}
 
@@ -22,34 +22,7 @@ reply_markup_end = ReplyKeyboardMarkup([[reset_action]], resize_keyboard=True)
 
 
 
-questions = [
-    {'question': 'Сколько вы вместе?', 'component': Q_1},
-    {'question': 'Как давно у вас начались конфликты', 'component': Q_2},
-    {'question': 'Сколько Вам лет?', 'component': Q_3},
-    {'question': 'Женаты / замужем ли вы?', 'component': Q_4},
-    {'question': 'Какими вы видите Ваши отношения в идеале?', 'component': Q_5},
-    {'question': 'Что самое главное вы ожидаете от вашего партнера в отношениях с вами?', 'component': Q_6},
-    {'question': 'Что не приемлемо для вас в отношениях?', 'component': Q_7},
-    ]
 
-users_answers = []
-
-async def question_answer_base(update: Update, contex: ContextTypes.DEFAULT_TYPE, question_index):
-    user_id = update.message.from_user.id
-    session = user_sessions[user_id]
-    # row = session["row"]
-    message = update.message.text.strip()
-    users_answers[question_index] = message
-    print(users_answers)
-    await update.message.reply_text(questions[question_index]['question'],  reply_markup=reply_markup2())
-    return questions[question_index]['component']
-
-async def question_answer_start(update: Update, contex: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(questions[0]['question'], reply_markup=reply_markup2)
-    return Q_1
-
-async def question_answer1(update: Update, contex: ContextTypes.DEFAULT_TYPE):
-    return await question_answer1(update, contex, 0)
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Введите код вашей пары:",  reply_markup=ReplyKeyboardRemove())
@@ -94,16 +67,14 @@ async def choose_device(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if session["device"] == "two" and msg_1 and uid_1:
         await update.message.reply_text("Ваш партнер ввел сообщение, ваша очередь:", reply_markup=reply_markup2)
-        # return STEP_MSG2
-        return Q_START
+        return STEP_MSG2
         session["is_first"] = False
 
     else:
         session["is_first"] = True
         # await update.message.reply_text("Введите сообщение партнёра 1:", reply_markup=ReplyKeyboardRemove())
         await update.message.reply_text("Введите сообщение партнёра 1:", reply_markup=reply_markup2)
-        # return STEP_MSG1
-        return Q_START
+        return STEP_MSG1
 
 # Первое сообщение
 async def get_message1(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -201,7 +172,6 @@ def main():
             STEP_MSG2: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_message2)],
             STEP_END: [MessageHandler(filters.TEXT & ~filters.COMMAND, ending)],
             STEP_END: [MessageHandler(filters.TEXT & ~filters.COMMAND, ending)],
-            Q_START: [MessageHandler(filters.TEXT & ~filters.COMMAND, question_answer_start)],
         },
         fallbacks=[CommandHandler("reset", reset)]
     )
