@@ -98,6 +98,8 @@ async def question_answer_base(update: Update, context: ContextTypes.DEFAULT_TYP
         return  global_step_changer(STEP_MSG2, update, context)
     return  global_step_changer(STEP_MSG2, update, context)  
     
+# Функция для создания обработчика вопросов
+# Используется для создания обработчиков для каждого вопроса
 def make_question_handler(question_index):
     async def question_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return await question_answer_base(update, context, question_index)
