@@ -6,10 +6,10 @@ from sheets import get_prompt_from_sheet
 logging.basicConfig(filename="errors.log", level=logging.ERROR)
 
 MODELS = [
-    "openai/gpt-4o",
-    "openai/gpt-3.5-turbo",
-    "deepseek-ai/deepseek-coder",
-    "google/gemini-pro",
+    # "openai/gpt-4o",
+    # "openai/gpt-3.5-turbo",
+    # "deepseek-ai/deepseek-coder",
+    # "google/gemini-pro",
     "mistralai/mistral-7b-instruct",
 ]
 
@@ -21,16 +21,19 @@ HEADERS = {
     "X-Title": "PsychologyBot",
 }
 
-def call_gpt(message_1, message_2):
+def call_gpt(value, extra_prefix):
+    
     prompt_prefix = get_prompt_from_sheet() or (
-        "Ты профессиональный психолог. Проанализируй сообщения двух партнёров и составь краткое резюме для психолога, используя научно обоснованные подходы."
+        "Ты профессиональный психолог."
     )
-
+     
     messages = [
-        {"role": "system", "content": prompt_prefix},
-        {"role": "user", "content": f"Партнёр 1: {message_1}\n\nПартнёр 2: {message_2}"}
+        {"role": "system", "content": f"{prompt_prefix}.\n\n{extra_prefix}"},
+        {"role": "user", "content": f"{value}"}
     ]
 
+    
+ 
     for model in MODELS:
         try:
             response = httpx.post(API_URL, headers=HEADERS, json={
@@ -53,3 +56,25 @@ def call_gpt(message_1, message_2):
             print(f"[GPT] Ошибка модели {model}: {e}")
 
     return "Ошибка: ни одна модель GPT не сработала."
+
+
+def call_gpt_pair(message_1, message_2):
+    extra_prefix = "Проанализируй сообщения двух партнёров и составь краткое резюме для психолога. Не надо рекомендаций, напиши пару предложений"
+    messages =  f"Партнёр 1: {message_1}\n\nПартнёр 2: {message_2}"
+    return call_gpt(messages, extra_prefix)
+
+def call_gpt_to_pair(message_1, message_2):
+    extra_prefix = "Проанализируй сообщения двух партнёров и составь краткое резюме c советами для пары. Не надо описывать, просто несколько предложений с рекомендациями."
+    messages =  f"Партнёр 1: {message_1}\n\nПартнёр 2: {message_2}"
+    return call_gpt(messages, extra_prefix)
+
+def call_gpt_to_psyhologist(message_1, message_2):
+    extra_prefix = "Проанализируй сообщения двух партнёров и составь краткое резюме с советами для психолога. Напиши только советы психологу для работы с данной парой"
+    messages =  f"Партнёр 1: {message_1}\n\nПартнёр 2: {message_2}"
+    return call_gpt(messages, extra_prefix)
+
+def call_gpt_user(user_message):
+    extra_prefix = "Проанализируй сообщения партнёра и составь краткое резюме для психолога. Опиши только одного пратнера, не надо описывать прару. Нам интересен только конкретный партнер"
+    message = f"Партнёр: {user_message}"
+    return call_gpt(message, extra_prefix)
+

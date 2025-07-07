@@ -3,7 +3,7 @@ from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes, ConversationHandler
 from config import TELEGRAM_BOT_TOKEN
 from sheets import *
-from gpt_analysis_openrouter import call_gpt
+from gpt_analysis_openrouter import call_gpt, call_gpt_user, call_gpt_pair, call_gpt_to_pair, call_gpt_to_psyhologist
 
 logging.basicConfig(filename="errors.log", level=logging.ERROR)
 
@@ -45,14 +45,12 @@ async def question_answer_base(update: Update, contex: ContextTypes.DEFAULT_TYPE
     row = session["row"]
     message = update.message.text.strip()
     users_answers[question_index] = message
-    print(users_answers, question_index)
     
     
 
     try:
         next_question = questions[question_index + 1]['question']
         await update.message.reply_text(next_question,  reply_markup=reply_markup2)
-        print(f"Задан вопрос {next_question}" )
 
         if 'component' in questions[question_index + 1] or len(questions) <= question_index:
             return questions[question_index + 1]['component']
@@ -136,10 +134,8 @@ async def choose_device(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     else:
         session["is_first"] = True
-        # await update.message.reply_text("Введите сообщение партнёра 1:", reply_markup=ReplyKeyboardRemove())
         await update.message.reply_text("Введите сообщение партнёра 1:", reply_markup=reply_markup2)
     
-    # return STEP_MSG1
     await update.message.reply_text(questions[0]['question'], reply_markup=reply_markup2)
     return Q_1
 
@@ -198,8 +194,23 @@ async def get_message2(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # Анализ сообщения
 async def send_message_to_users(uid_1, msg_1, uid_2, msg_2, row, context, update):
     await update.message.reply_text("Делаем анализ, подождите")
-    summary = call_gpt(msg_1, msg_2)
+  
+    about_user1 = call_gpt_user(msg_1)
+    write_user1_analysis(row, about_user1)
+    
+    about_user2 = call_gpt_user(msg_1)
+    write_user2_analysis(row, about_user2)
+    
+    summary = call_gpt_pair(msg_1, msg_2)
     write_summary(row, summary)
+    
+    to_pair_rec = call_gpt_to_pair(msg_1, msg_2)
+    write_recommendation(row, to_pair_rec)
+    
+    to_psych_rec = call_gpt_to_psyhologist(msg_1, msg_2)
+    write_recommendation_to_apsychologist(row, to_psych_rec)
+  
+    
     if uid_1:
         await context.bot.send_message(chat_id=int(uid_1), text="✅ Анализ завершён. Психолог получил резюме.")
     if uid_2 and uid_2 != uid_1:
