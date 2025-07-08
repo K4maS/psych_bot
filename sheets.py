@@ -5,7 +5,7 @@ import logging
 
 logging.basicConfig(filename="errors.log", level=logging.ERROR)
 
-ZERO, CODE, UID_1, MESSAGE_1, USER1_ANALYSIS, UID_2, MESSAGE_2, USER2_ANALYSIS, SYMMARY, RECOMENDATION, RECOMENDATION_TO_A_PSYHOLOGIST = range(11)
+CODE, NAME, UID_1, MESSAGE_1, USER1_ANALYSIS, UID_2, MESSAGE_2, USER2_ANALYSIS, SUMMARY, RECOMENDATION, RECOMENDATION_TO_A_PSYHOLOGIST = range(1,12)
 
 
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
@@ -65,6 +65,16 @@ def read_messages(row):
     except Exception as e:
         logging.error(f"[GoogleSheets] Ошибка чтения сообщений: {e}")
         raise
+    
+def read_column(row, column):
+    sheet = get_worksheet()
+    try:
+        column = sheet.cell(row, column).value
+        return column
+    except Exception as e:
+        logging.error(f"[GoogleSheets] Ошибка чтения сообщений: {e}")
+        raise
+    
 
 def write_to_cell(row, column, value):
     sheet = get_worksheet()
@@ -75,7 +85,7 @@ def write_to_cell(row, column, value):
         raise
 
 def write_summary(row, value):
-    write_to_cell(row, SYMMARY, value)
+    write_to_cell(row, SUMMARY, value)
     
 def write_user1_analysis(row, value):
     write_to_cell(row, USER1_ANALYSIS, value)

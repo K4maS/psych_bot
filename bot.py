@@ -3,7 +3,7 @@ from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes, ConversationHandler
 from config import TELEGRAM_BOT_TOKEN
 from sheets import *
-from gpt_analysis_openrouter import call_gpt, call_gpt_user, call_gpt_pair, call_gpt_to_pair, call_gpt_to_psyhologist
+from gpt_analysis_openrouter import call_gpt, call_gpt_user, call_gpt_pair, call_gpt_to_pair, call_gpt_pair_to_psyhologist, call_gpt_single, call_gpt_to_single, call_gpt_single_to_psyhologist
 
 logging.basicConfig(filename="errors.log", level=logging.ERROR)
 
@@ -18,13 +18,14 @@ back_action = "Назад"
 reset_action = "Сначала"
 
 
-reply_markup2 = ReplyKeyboardMarkup([[back_action, reset_action]], resize_keyboard=True)
+reply_markup_back_reset = ReplyKeyboardMarkup([[back_action, reset_action]], resize_keyboard=True)
+reply_markup_gender = ReplyKeyboardMarkup([['Мужской', 'Женский'],[back_action, reset_action]], resize_keyboard=True)
 reply_markup_end = ReplyKeyboardMarkup([[reset_action]], resize_keyboard=True)
 
-questions = [
+steps = [
     {'question': 'Введите ваш код:', 'component': STEP_CODE},
     {'question': 'Подключение успешно. Укажите, какие проблемы вы собираетесь решать:', 'component': STEP_DEVICE},
-    {'question': 'Ваш пол', 'component': Q_1},
+    {'question': 'Ваш пол', 'reply_markup': reply_markup_gender , 'component': Q_1},
     {'question': 'Сколько Вам лет?', 'component': Q_2},
     {'question': 'Сколько вы вместе?', 'component': Q_3},
     {'question': 'Как давно у вас начались конфликты', 'component': Q_4},
@@ -32,73 +33,92 @@ questions = [
     {'question': 'Какими вы видите Ваши отношения в идеале?', 'component': Q_6},
     {'question': 'Что самое главное вы ожидаете от вашего партнера в отношениях с вами?', 'component': Q_7},
     {'question': 'Что не приемлемо для вас в отношениях?', 'component': Q_8},
-    {'question': 'Введите сообщение партнёра 1:', 'component': STEP_MSG1},
+    {'question': 'Введите ваше сообщение:', 'component': STEP_MSG1},
     {'question': 'Теперь введите сообщение партнёра 2:', 'component': STEP_MSG2},
     {'question': 'Сессия прошла успешно', 'component': STEP_END},
 ]
 
 
-users_answers = [None] *  len(questions)
-
-current_step = 0
-
-def create_answers_format (questions, users_answers):
-    text = '\n\n Заданные вопросы пользователю: \n'
+# Функция для создания формата ответов
+# Используется для форматирования вопросов и ответов пользователя
+def create_answers_format (steps, users_actions, context, left_cut=Q_1, right_cut=STEP_MSG1):
+    questions = steps[left_cut : right_cut]
+    users_actions = context.user_data.get("users_actions", [None] * len(steps))
+    users_answers = users_actions[left_cut : right_cut]
+    
+    text = '\n\n Вопросы заданные психологом пользователю: \n'
     for index, question in enumerate(questions):
         text += f'- {question["question"]}\n  - {users_answers[index]}\n'
     return text +'\n'
 
+# Функция для навигации между шагами
+# Используется для обработки действий пользователя, таких как переход назад или сброс сессии
 async def navigation(message, update, context):
-    global current_step
+    current_step = context.user_data.get("current_step", 0)
     print(f'Вы перешли на шаг {current_step}')
+    
     if message == reset_action:
         return await reset(update, context)
     elif message == back_action:
         if current_step <= 0:
-            await update.message.reply_text("Вы находитесь на первом шаге. Невозможно вернуться назад.", reply_markup=reply_markup2)
+            await update.message.reply_text("Вы находитесь на первом шаге.", reply_markup=reply_markup_back_reset)
         else:
-            current_step -=1
-            if current_step == STEP_DEVICE:
-                await update.message.reply_text(questions[current_step]["question"], reply_markup=reply_markup)
-            else:
-                await update.message.reply_text(questions[current_step]["question"], reply_markup=reply_markup2)
-            
+            current_step -= 1
+            context.user_data["current_step"] = current_step
+            await message_replay(steps[current_step], update, context)
         return current_step
     
+# Функция для изменения глобального шага
+# Используется для записи текущего шага в глобальную переменную
+# и вывода сообщения о переходе на новый шаг
 def global_step_changer(step, update, context):
-    global current_step
-    current_step = step
+    context.user_data["current_step"] = step
     print(f'Вы перешли на шаг {step}')
     return step 
 
+# Функция для обработки вопросов и ответов
+# Используется для обработки ответов на вопросы и перехода к следующему вопросу
 async def question_answer_base(update: Update, context: ContextTypes.DEFAULT_TYPE, question_index):
     user_id = update.message.from_user.id
     session = user_sessions[user_id]
     row = session["row"]
+    device = session["device"]
     message = update.message.text.strip()
-    users_answers[question_index] = message
+    users_actions = context.user_data.get("users_actions", [None] * len(steps))
+    users_actions[question_index] = message
+    context.user_data["users_actions"] = users_actions  # сохраняем
+    
+    if device == "one" and question_index == Q_2: 
+        await update.message.reply_text("Опишите ваши проблемы:")
+        return  global_step_changer(STEP_MSG1, update, context)
     
     if message == reset_action or message == back_action:
+       
         return await navigation(message, update, context)    
 
     try:
-        next_question = questions[question_index + 1]
-        next_question_text = next_question['question']
-        await update.message.reply_text(next_question_text,  reply_markup=reply_markup2)
-
-        if 'component' in next_question or len(questions) <= question_index:
-            # current_step = next_question['component']
-            # return current_step
+        next_question = steps[question_index + 1]
+        
+        await message_replay(next_question, update, context)
+        
+        if 'component' in next_question or len(steps) <= question_index:
             return global_step_changer(next_question['component'], update, context)
         
     except IndexError:
         await update.message.reply_text("Опишите ваши проблемы:")
     
     uid_1, msg_1, uid_2, msg_2 = read_messages(row)
-    if msg_1 and uid_1 and session["device"] == "one":
+    if msg_1 and uid_1 and device == "one":
         return  global_step_changer(STEP_MSG2, update, context)
-    return  global_step_changer(STEP_MSG2, update, context)  
-    
+    return  global_step_changer(STEP_MSG1, update, context)
+
+# Вывод сообщения с вопросом и кнопками
+async def message_replay(step, update, context):
+    question_text = step['question']
+    reply_markup = step['reply_markup'] if 'reply_markup' in step else None
+
+    return await update.message.reply_text(question_text,  reply_markup=reply_markup if reply_markup else reply_markup_back_reset)
+
 # Функция для создания обработчика вопросов
 # Используется для создания обработчиков для каждого вопроса
 def make_question_handler(question_index):
@@ -106,11 +126,17 @@ def make_question_handler(question_index):
         return await question_answer_base(update, context, question_index)
     return question_handler
 
+
+
+# Начало сессии
+# Вызывается при команде /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(questions[STEP_CODE]['question'],  reply_markup=ReplyKeyboardRemove())
+    await update.message.reply_text(steps[STEP_CODE]['question'],  reply_markup=ReplyKeyboardRemove())
     print("[BOT] Пользователь начал ввод кода.")
     return  global_step_changer(STEP_CODE, update, context)
 
+# Получение кода
+# Вызывается при вводе кода пользователем
 async def get_code(update: Update, context: ContextTypes.DEFAULT_TYPE):
     code = update.message.text.strip()
     user_id = update.message.from_user.id
@@ -119,18 +145,19 @@ async def get_code(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if row is None:
         await update.message.reply_text("Код не найден. Повторите ввод.")
         return  global_step_changer(STEP_CODE, update, context)
-
-    uid_1, msg_1, uid_2, msg_2 = read_messages(row)
-    if uid_1 and msg_1 and uid_2 and msg_2:
+ 
+    summary = read_column(row, SUMMARY)
+    if summary:
         await update.message.reply_text("Этот код уже использован. Введите другой код.")
         return  global_step_changer(STEP_CODE, update, context)
 
     user_sessions[user_id] = {"code": code, "row": row}
-    await update.message.reply_text(questions[STEP_DEVICE]['question'], reply_markup=reply_markup)
+    await update.message.reply_text(steps[STEP_DEVICE]['question'], reply_markup=reply_markup)
     print(f"[BOT] Код {code} принят, строка {row}")
     return  global_step_changer(STEP_DEVICE, update, context)
 
-#Выбро девайса
+# Выбро режима сеанса  
+# Вызывается при выборе устройства пользователем
 async def choose_device(update: Update, context: ContextTypes.DEFAULT_TYPE):
     choice = update.message.text
     user_id = update.message.from_user.id
@@ -148,43 +175,44 @@ async def choose_device(update: Update, context: ContextTypes.DEFAULT_TYPE):
     uid_1, msg_1, uid_2, msg_2 = read_messages(row)
 
     if session["device"] == "two" and msg_1 and uid_1:
-        await update.message.reply_text("Ваш партнер ввел сообщение, ваша очередь:", reply_markup=reply_markup2)
+        await update.message.reply_text("Ваш партнер ввел сообщение, ваша очередь:", reply_markup=reply_markup_back_reset)
         session["is_first"] = False
 
     else:
         session["is_first"] = True
-        await update.message.reply_text("Введите ваше сообщение:", reply_markup=reply_markup2)
-
-    await update.message.reply_text(questions[first_question]['question'], reply_markup=reply_markup2)
+        await update.message.reply_text("Введите ваше сообщение:", reply_markup=reply_markup_back_reset)
+    await message_replay(steps[first_question], update, context)
     return  global_step_changer(first_question, update, context)    
  
-
 # Первое сообщение
 async def get_message1(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.from_user.id
     session = user_sessions[user_id]
     row = session["row"]
+    device = session["device"]
     message = update.message.text.strip()
     is_first = True
-
+    users_actions = context.user_data.get("users_actions", [None] * len(steps))
+    questions_cut = STEP_MSG1
+    
     if message == reset_action:
         return await reset(update, context)
     uid_1, msg_1, uid_2, msg_2 = read_messages(row)
 
-    if msg_1 and uid_1 and session["device"] != "one":
+    if msg_1 and uid_1 and device != "one":
         is_first = False
+    
+    if device == "one":
+        questions_cut = Q_3
 
-    write_message(row, user_id, create_answers_format (questions, users_answers) + message, is_first)
+    write_message(row, user_id, create_answers_format(steps, users_actions, context, Q_1, questions_cut ) + message, is_first)
     print(f"[BOT] Сообщение записано в строку {row}")
 
-    if session["device"] == "one":
-        # await update.message.reply_text("Теперь введите сообщение партнёра 2:")
-        # await update.message.reply_text(questions[first_question]['question'], reply_markup=reply_markup2)
-        # return  global_step_changer(STEP_MSG2, update, context)
-        return await do_analysis(update, context, session["device"], row)
+    if device == "one":
+        return await do_analysis(update, context, device, row)
     else:
         if not is_first:
-            await send_message_to_users(uid_1, msg_1, uid_2, msg_2, row, context, update)
+            await analysis_and_send_message_to_users(uid_1, msg_1, uid_2, msg_2, row, context, update)
         await update.message.reply_text("Сообщение принято. Ждём второго участника.")
         return  global_step_changer(STEP_END, update, context)
 
@@ -194,21 +222,23 @@ async def get_message2(update: Update, context: ContextTypes.DEFAULT_TYPE):
     session = user_sessions[user_id]
     row = session["row"]
     message = update.message.text.strip()
-
+    users_actions = context.user_data.get("users_actions", [None] * len(steps))
+    
     if message == reset_action:
         return await reset(update, context)
 
-    write_message(row, user_id,  create_answers_format (questions, users_answers) + message, is_first=False)
+    write_message(row, user_id,  create_answers_format (steps, users_actions, context) + message, is_first=False)
     print(f"[BOT] Сообщение партнёра 2 записано в строку {row}")
 
-
+# Анализ сообщений
+# Вызывается после получения обоих сообщений
 async def do_analysis(update: Update, context: ContextTypes.DEFAULT_TYPE, device, row):
    
     await update.message.reply_text("Делаем анализ, подождите")
     try:
         uid_1, msg_1, uid_2, msg_2 = read_messages(row)
         if (msg_1 and msg_2) or  msg_1 and device == "one":
-           await send_message_to_users(uid_1, msg_1, uid_2, msg_2, row, context, update)
+           await analysis_and_send_message_to_users(uid_1, msg_1, uid_2, msg_2, row, context, update)
         else:
             await update.message.reply_text("Ожидаем сообщение второго партнёра.")
     except Exception as e:
@@ -217,15 +247,14 @@ async def do_analysis(update: Update, context: ContextTypes.DEFAULT_TYPE, device
     return  global_step_changer(STEP_END, update, context)
 
 # Анализ сообщения
-async def send_message_to_users(uid_1, msg_1, uid_2, msg_2, row, context, update):
+async def analysis_and_send_message_to_users(uid_1, msg_1, uid_2, msg_2, row, context, update):
     await update.message.reply_text("Делаем анализ, подождите")
   
     about_user1 = call_gpt_user(msg_1)
     write_user1_analysis(row, about_user1)
-    
-   
-    
-    if msg_2: 
+    print(f"[GPT] Анализируем пользователя: {msg_2}")
+    if msg_1 and msg_2: 
+        print(f"[GPT] Анализируем пару: {uid_1} и {uid_2}")
         about_user2 = call_gpt_user(msg_2)
         write_user2_analysis(row, about_user2)
         
@@ -235,7 +264,17 @@ async def send_message_to_users(uid_1, msg_1, uid_2, msg_2, row, context, update
         to_pair_rec = call_gpt_to_pair(msg_1, msg_2)
         write_recommendation(row, to_pair_rec)
         
-        to_psych_rec = call_gpt_to_psyhologist(msg_1, msg_2)
+        to_psych_rec = call_gpt_pair_to_psyhologist(msg_1, msg_2)
+        write_recommendation_to_apsychologist(row, to_psych_rec)
+    else:
+        print(f"[GPT] Анализируем пользователя: {uid_1}")
+        summary = call_gpt_single(msg_1)
+        write_summary(row, summary)
+        
+        to_pair_rec = call_gpt_to_single(msg_1)
+        write_recommendation(row, to_pair_rec)
+        
+        to_psych_rec = call_gpt_single_to_psyhologist(msg_1)
         write_recommendation_to_apsychologist(row, to_psych_rec)
   
     
@@ -251,7 +290,7 @@ async def ending(update: Update, context: ContextTypes.DEFAULT_TYPE):
     session = user_sessions[user_id]
     message = update.message.text.strip()
 
-    await update.message.reply_text(questions[STEP_END]['question'],  reply_markup=reply_markup_end)
+    await update.message.reply_text(steps[STEP_END]['question'],  reply_markup=reply_markup_end)
 
     if message == reset_action:
         return await reset(update, context)
@@ -261,7 +300,7 @@ async def ending(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def reset(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.from_user.id
     user_sessions.pop(user_id, None)
-    users_answers = [None] *  len(questions)
+    context.user_data["users_actions"] = [None] * len(steps)
     
     await update.message.reply_text("Сессия сброшена. Введите код пары:",  reply_markup=ReplyKeyboardRemove())
     return  global_step_changer(STEP_CODE, update, context)
