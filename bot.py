@@ -4,10 +4,17 @@ from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, fil
 from config import TELEGRAM_BOT_TOKEN
 from sheets import *
 from gpt_analysis_openrouter import call_gpt, call_gpt_user, call_gpt_pair, call_gpt_to_pair, call_gpt_to_psyhologist
+from supabase_client import (
+    supabase,
+    get_row_from_patients_db,
+    get_row_from_psycho_by_psychoid_db,
+    insert_row_to_patients_db,
+    insert_row_to_psycho_db
+ )
 
 logging.basicConfig(filename="errors.log", level=logging.ERROR)
 
-STEP_CODE, Q_1, Q_2, Q_3, Q_4, Q_5, Q_6, Q_7, STEP_DEVICE, STEP_MSG1, STEP_MSG2, STEP_END = range(12)
+STEP_CODE, STEP_PSYCHO_CODE, Q_1, Q_2, Q_3, Q_4, Q_5, Q_6, Q_7, STEP_DEVICE, STEP_MSG1, STEP_MSG2, STEP_END = range(13)
 
 user_sessions = {}  # user_id: {code, row, device, is_first}
 
@@ -87,10 +94,40 @@ async def question_answer6(update: Update, contex: ContextTypes.DEFAULT_TYPE):
 async def question_answer7(update: Update, contex: ContextTypes.DEFAULT_TYPE):
     return await question_answer_base(update, contex, 6)
 
+ 
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Введите код вашей пары:",  reply_markup=ReplyKeyboardRemove())
+    await test()
+    code = update.message.text.strip()
+    user_id = update.message.from_user.id
     print("[BOT] Пользователь начал ввод кода.")
+    row = await get_row_from_patients_db(user_id)
+    if row is None:
+        await update.message.reply_text("В первый раз? Введите код психолога")
+        return STEP_PSYCHO_CODE
+    
+        await update.message.reply_text("Введите код вашей пары:",  reply_markup=ReplyKeyboardRemove())
     return STEP_CODE
+
+async def test ():
+   return await insert_row_to_patients_db(12234, {"psychologist_id": '9999', "name": "K"})
+ 
+
+async def get_psycho_code(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    code = update.message.text.strip()
+    username = update.message.from_user.username
+    user_id = update.message.from_user.id
+    row = await get_row_from_psycho_by_psychoid_db(code)
+
+    if row is None:
+        await update.message.reply_text("Код психолога не найден. Пожалуйста, введите правильный код.")
+        return STEP_PSYCHO_CODE
+    else:
+        await insert_row_to_patients_db(user_id, {"psychologist_id": code, "name": username})
+    await update.message.reply_text("Код психолога принят. Теперь введите код вашей пары:", reply_markup=ReplyKeyboardRemove())
+    print(f"[BOT] Код {code} принят, строка {row}")
+    return STEP_CODE
+
 
 async def get_code(update: Update, context: ContextTypes.DEFAULT_TYPE):
     code = update.message.text.strip()
@@ -245,6 +282,7 @@ def main():
     conv = ConversationHandler(
         entry_points=[CommandHandler("start", start)],
         states={
+            STEP_PSYCHO_CODE: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_psycho_code)],
             STEP_CODE: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_code)],
             STEP_DEVICE: [MessageHandler(filters.TEXT & ~filters.COMMAND, choose_device)],
             STEP_MSG1: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_message1)],

@@ -5,3 +5,5 @@ GOOGLE_CREDENTIALS_JSON = "pairpsyhologybot.json"  # OAuth файл
 SHEET_NAME = "Sheet1"
 PROMPT_SHEET_NAME = "Prompt"
 spreadsheet_id = "spreadsheet_id"
+SUPABASE_URL = "https://your-project.supabase.co"  # ← сюда свой URL из Supabase
+SUPABASE_ANON_KEY = "your-anon-key"  #
