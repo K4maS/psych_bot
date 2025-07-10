@@ -3,7 +3,9 @@ from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes, ConversationHandler
 from config import TELEGRAM_BOT_TOKEN
 from sheets import *
-from gpt_analysis_openrouter import call_gpt, call_gpt_user, call_gpt_pair, call_gpt_to_pair, call_gpt_to_psyhologist
+from util import create_answers_format, make_question_handler, global_step_changer, message_replay, navigation
+from seance_data import *
+from gpt_analysis_openrouter import *
 from supabase_client import (
     supabase,
     get_row_from_patients_db,
@@ -13,104 +15,21 @@ from supabase_client import (
  )
 
 logging.basicConfig(filename="errors.log", level=logging.ERROR)
-
-STEP_CODE, STEP_PSYCHO_CODE, Q_1, Q_2, Q_3, Q_4, Q_5, Q_6, Q_7, STEP_DEVICE, STEP_MSG1, STEP_MSG2, STEP_END = range(13)
-
-user_sessions = {}  # user_id: {code, row, device, is_first}
-
-reply_markup = ReplyKeyboardMarkup([["С одного устройства", "С двух устройств", "Сначала"]], resize_keyboard=True)
-
-back_action = "Назад"
-reset_action = "Сначала"
-
-
-reply_markup2 = ReplyKeyboardMarkup([[back_action, reset_action]], resize_keyboard=True)
-reply_markup_end = ReplyKeyboardMarkup([[reset_action]], resize_keyboard=True)
-
-questions = [
-    {'question': 'Сколько вы вместе?', 'component': Q_1},
-    {'question': 'Как давно у вас начались конфликты', 'component': Q_2},
-    {'question': 'Сколько Вам лет?', 'component': Q_3},
-    {'question': 'Женаты / замужем ли вы?', 'component': Q_4},
-    {'question': 'Какими вы видите Ваши отношения в идеале?', 'component': Q_5},
-    {'question': 'Что самое главное вы ожидаете от вашего партнера в отношениях с вами?', 'component': Q_6},
-    {'question': 'Что не приемлемо для вас в отношениях?', 'component': Q_7},
-    ]
-
-
-users_answers = [None] *  len(questions)
-
-def create_answers_format (questions, users_answers):
-    text = '\n\n Заданные вопросы пользователю: \n'
-    for index, question in enumerate(questions):
-        text += f'- {question['question']}\n  - {users_answers[index]}\n'
-    return text +'\n'
-
-async def question_answer_base(update: Update, contex: ContextTypes.DEFAULT_TYPE, question_index):
-    user_id = update.message.from_user.id
-    session = user_sessions[user_id]
-    row = session["row"]
-    message = update.message.text.strip()
-    users_answers[question_index] = message
-    
-    
-
-    try:
-        next_question = questions[question_index + 1]['question']
-        await update.message.reply_text(next_question,  reply_markup=reply_markup2)
-
-        if 'component' in questions[question_index + 1] or len(questions) <= question_index:
-            return questions[question_index + 1]['component']
-
-        
-    except IndexError:
-        await update.message.reply_text("Опишите ваши проблемы:")
-    
-    uid_1, msg_1, uid_2, msg_2 = read_messages(row)
-    if msg_1 and uid_1 and session["device"] == "one":
-        return  STEP_MSG2
-    return  STEP_MSG1   
-    
-
-async def question_answer1(update: Update, contex: ContextTypes.DEFAULT_TYPE):
-    users_answers = [None] *  len(questions)
-    return await question_answer_base(update, contex, 0)
-
-async def question_answer2(update: Update, contex: ContextTypes.DEFAULT_TYPE):
-    return await question_answer_base(update, contex, 1)
-
-async def question_answer3(update: Update, contex: ContextTypes.DEFAULT_TYPE):
-    return await question_answer_base(update, contex, 2)
-
-async def question_answer4(update: Update, contex: ContextTypes.DEFAULT_TYPE):
-    return await question_answer_base(update, contex, 3)
-
-async def question_answer5(update: Update, contex: ContextTypes.DEFAULT_TYPE):
-    return await question_answer_base(update, contex, 4)
-
-async def question_answer6(update: Update, contex: ContextTypes.DEFAULT_TYPE):
-    return await question_answer_base(update, contex, 5)
-
-async def question_answer7(update: Update, contex: ContextTypes.DEFAULT_TYPE):
-    return await question_answer_base(update, contex, 6)
-
  
-
+ 
+# Начало сессии
+# Вызывается при команде /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await test()
     code = update.message.text.strip()
     user_id = update.message.from_user.id
     print("[BOT] Пользователь начал ввод кода.")
     row = await get_row_from_patients_db(user_id)
-    if row is None:
-        await update.message.reply_text("В первый раз? Введите код психолога")
-        return STEP_PSYCHO_CODE
+    next_step = STEP_PSYCHO_CODE if row is None else STEP_CODE
     
-        await update.message.reply_text("Введите код вашей пары:",  reply_markup=ReplyKeyboardRemove())
-    return STEP_CODE
+    await update.message.reply_text(steps[next_step]['question'],  reply_markup=ReplyKeyboardRemove())
+    return   global_step_changer(steps[next_step]['component'], update, context)
 
-async def test ():
-   return await insert_row_to_patients_db(12234, {"psychologist_id": '9999', "name": "K"})
+
  
 
 async def get_psycho_code(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -121,14 +40,16 @@ async def get_psycho_code(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if row is None:
         await update.message.reply_text("Код психолога не найден. Пожалуйста, введите правильный код.")
-        return STEP_PSYCHO_CODE
+        return global_step_changer(STEP_PSYCHO_CODE, update, context)
     else:
         await insert_row_to_patients_db(user_id, {"psychologist_id": code, "name": username})
     await update.message.reply_text("Код психолога принят. Теперь введите код вашей пары:", reply_markup=ReplyKeyboardRemove())
     print(f"[BOT] Код {code} принят, строка {row}")
-    return STEP_CODE
+    return global_step_changer(STEP_CODE, update, context)
 
 
+# Получение кода
+# Вызывается при вводе кода пользователем
 async def get_code(update: Update, context: ContextTypes.DEFAULT_TYPE):
     code = update.message.text.strip()
     user_id = update.message.from_user.id
@@ -136,143 +57,164 @@ async def get_code(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if row is None:
         await update.message.reply_text("Код не найден. Повторите ввод.")
-        return STEP_CODE
-
-    uid_1, msg_1, uid_2, msg_2 = read_messages(row)
-    if uid_1 and msg_1 and uid_2 and msg_2:
+        return  global_step_changer(STEP_CODE, update, context)
+ 
+    summary = read_column(row, SUMMARY)
+    if summary:
         await update.message.reply_text("Этот код уже использован. Введите другой код.")
-        return STEP_CODE
+        return  global_step_changer(STEP_CODE, update, context)
 
     user_sessions[user_id] = {"code": code, "row": row}
-    await update.message.reply_text("Подключение успешно. Укажите, с одного или с двух устройств вы пишете:", reply_markup=reply_markup)
+    await update.message.reply_text(steps[STEP_DEVICE]['question'], reply_markup=reply_markup)
     print(f"[BOT] Код {code} принят, строка {row}")
-    return STEP_DEVICE
+    return  global_step_changer(STEP_DEVICE, update, context)
 
-#Выбро девайса
+# Выбро режима сеанса  
+# Вызывается при выборе устройства пользователем
 async def choose_device(update: Update, context: ContextTypes.DEFAULT_TYPE):
     choice = update.message.text
     user_id = update.message.from_user.id
     session = user_sessions[user_id]
     row = session["row"]
-
-    if "одного" in choice:
+    choice_lower = choice.lower()
+    if "свои" in choice_lower:
         session["device"] = "one"
-    elif "двух" in choice:
+    elif "пары" in choice_lower:
         session["device"] = "two"
-    elif reset_action in choice:
+    elif reset_action.lower() in choice_lower:
         return await reset(update, context)
     else:
-        return STEP_DEVICE
+        return  global_step_changer(STEP_DEVICE, update, context)
     uid_1, msg_1, uid_2, msg_2 = read_messages(row)
 
     if session["device"] == "two" and msg_1 and uid_1:
-        await update.message.reply_text("Ваш партнер ввел сообщение, ваша очередь:", reply_markup=reply_markup2)
+        await update.message.reply_text("Ваш партнер ввел сообщение, ваша очередь:", reply_markup=reply_markup_back_reset)
         session["is_first"] = False
 
     else:
         session["is_first"] = True
-        await update.message.reply_text("Введите сообщение партнёра 1:", reply_markup=reply_markup2)
-    
-    await update.message.reply_text(questions[0]['question'], reply_markup=reply_markup2)
-    return Q_1
-
+        await update.message.reply_text("Введите ваше сообщение:", reply_markup=reply_markup_back_reset)
+    await message_replay(steps[first_question], update, context)
+    return  global_step_changer(first_question, update, context)    
+ 
 # Первое сообщение
 async def get_message1(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.from_user.id
     session = user_sessions[user_id]
     row = session["row"]
+    device = session["device"]
     message = update.message.text.strip()
     is_first = True
-
-    if message == reset_action:
-        return await reset(update, context)
+    users_actions = context.user_data.get("users_actions", [None] * len(steps))
+    questions_cut = Q_3 if device == "one" else STEP_MSG1
+    message_with_answers = create_answers_format(steps, users_actions, context, Q_1, questions_cut ) + message
+    
+    if message == reset_action or message == back_action:
+        return await navigation(message, update, context)
+    
     uid_1, msg_1, uid_2, msg_2 = read_messages(row)
 
-    if msg_1 and uid_1 and session["device"] != "one":
+    if msg_1 and uid_1 and device != "one":
         is_first = False
+    
+   
+        
+    write_message(row, user_id, message_with_answers, is_first)
+    
+ 
+    uid_2 = update.message.chat.id
+    msg_2 = message_with_answers
+    print(f'get_message1 "uid_1 {uid_1}, msg_1 {msg_1}, uid_2 {uid_2}, msg_2 {msg_2}')
+    print(f"[BOT] Сообщение записано в строку {row}")
+    return await do_analysis(update, context,  device, row)
 
-    write_message(row, user_id, create_answers_format (questions, users_answers) + message, is_first)
-    print(f"[BOT] Сообщение партнёра 1 записано в строку {row}")
 
-    if session["device"] == "one":
-        await update.message.reply_text("Теперь введите сообщение партнёра 2:")
-        await update.message.reply_text(questions[0]['question'], reply_markup=reply_markup2)
-        return Q_1
-    else:
-        if not is_first:
-            await send_message_to_users(uid_1, msg_1, uid_2, msg_2, row, context, update)
-        await update.message.reply_text("Сообщение принято. Ждём второго участника.")
-        return STEP_END
 
-# Второе сообщение
-async def get_message2(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.message.from_user.id
-    session = user_sessions[user_id]
-    row = session["row"]
-    message = update.message.text.strip()
-
-    if message == reset_action:
-        return await reset(update, context)
-
-    write_message(row, user_id,  create_answers_format (questions, users_answers) + message, is_first=False)
-    print(f"[BOT] Сообщение партнёра 2 записано в строку {row}")
-    await update.message.reply_text("Делаем анализ, подождите")
+async def do_analysis(update: Update, context: ContextTypes.DEFAULT_TYPE, device, row):
+    await update.message.reply_text("Делаем анализ, подождите",  reply_markup=ReplyKeyboardRemove())
+     
     try:
         uid_1, msg_1, uid_2, msg_2 = read_messages(row)
-        if msg_1 and msg_2:
-           await send_message_to_users(uid_1, msg_1, uid_2, msg_2, row, context, update)
+
+        if (msg_1 and msg_2) or  msg_1 and device == "one":
+           await analysis_and_send_message_to_users(uid_1, msg_1, uid_2, msg_2, row, context, update)
         else:
-            await update.message.reply_text("Ожидаем сообщение второго партнёра.")
+            await update.message.reply_text("Ожидаем сообщение второго партнёра.", reply_markup= reply_markup_end)
     except Exception as e:
         logging.error(f"[BOT] Ошибка анализа: {e}")
-        await update.message.reply_text("Произошла ошибка при анализе.")
-    return STEP_END
+        await update.message.reply_text("Произошла ошибка при анализе.", reply_markup= reply_markup_end)
+    return  global_step_changer(STEP_END, update, context)
 
 # Анализ сообщения
-async def send_message_to_users(uid_1, msg_1, uid_2, msg_2, row, context, update):
-    await update.message.reply_text("Делаем анализ, подождите")
+async def analysis_and_send_message_to_users(uid_1, msg_1, uid_2, msg_2, row, context, update):
+    try:
+        about_user1 = call_gpt_user(msg_1)
+        write_user1_analysis(row, about_user1)
+        print(f"[GPT] Анализируем пользователя: {msg_2}")
+        if msg_1 and not msg_2:
+            print(f"[GPT] Анализируем пользователя: {uid_1}")
+            summary = call_gpt_single(msg_1)
+            write_summary(row, summary)
+            
+            to_pair_rec = call_gpt_to_single(msg_1)
+            write_recommendation(row, to_pair_rec)
+            
+            to_psych_rec = call_gpt_single_to_psyhologist(msg_1)
+            write_recommendation_to_apsychologist(row, to_psych_rec)
+        else: 
+            print(f"[GPT] Анализируем пару: {uid_1} и {uid_2}")
+            about_user2 = call_gpt_user(msg_2)
+            write_user2_analysis(row, about_user2)
+            
+            summary = call_gpt_pair(msg_1, msg_2)
+            write_summary(row, summary)
+            
+            to_pair_rec = call_gpt_to_pair(msg_1, msg_2)
+            write_recommendation(row, to_pair_rec)
+            
+            to_psych_rec = call_gpt_pair_to_psyhologist(msg_1, msg_2)
+            write_recommendation_to_apsychologist(row, to_psych_rec)
+        
+        if uid_1:
+            await context.bot.send_message(chat_id=int(uid_1), text="✅ Анализ завершён. Психолог получил резюме.", reply_markup=reply_markup_end)
+        if uid_2 and uid_2 != uid_1:
+            await context.bot.send_message(chat_id=int(uid_2), text="✅ Анализ завершён. Психолог получил резюме.", reply_markup=reply_markup_end)
+        print(f"[GPT] Анализ завершён и записан.")
+      
+    except Exception as e:
+        logging.error(f"[GPT] Ошибка анализа: {e}")
+        await update.message.reply_text("Произошла ошибка при анализе. Пожалуйста, попробуйте позже.", reply_markup=reply_markup_end)
+        return
   
-    about_user1 = call_gpt_user(msg_1)
-    write_user1_analysis(row, about_user1)
     
-    about_user2 = call_gpt_user(msg_1)
-    write_user2_analysis(row, about_user2)
-    
-    summary = call_gpt_pair(msg_1, msg_2)
-    write_summary(row, summary)
-    
-    to_pair_rec = call_gpt_to_pair(msg_1, msg_2)
-    write_recommendation(row, to_pair_rec)
-    
-    to_psych_rec = call_gpt_to_psyhologist(msg_1, msg_2)
-    write_recommendation_to_apsychologist(row, to_psych_rec)
-  
-    
-    if uid_1:
-        await context.bot.send_message(chat_id=int(uid_1), text="✅ Анализ завершён. Психолог получил резюме.")
-    if uid_2 and uid_2 != uid_1:
-        await context.bot.send_message(chat_id=int(uid_2), text="✅ Анализ завершён. Психолог получил резюме.")
-    print(f"[GPT] Анализ завершён и записан.")
-
 # Компонент после всех сообщений
 async def ending(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.message.from_user.id
-    session = user_sessions[user_id]
-    message = update.message.text.strip()
+    try:
+        user_id = update.message.from_user.id
+        session = user_sessions[user_id]
+        message = update.message.text.strip()
 
-    await update.message.reply_text("Сессия прошла успешно",  reply_markup=reply_markup_end)
-
-    if message == reset_action:
-        return await reset(update, context)
-
-    return STEP_END
+        if message == reset_action:
+            return await reset(update, context)
+        return  global_step_changer(STEP_END, update, context)
+    except Exception as e:
+        logging.error(f"[BOT] Ошибка в конце сессии: {e}")
+        await update.message.reply_text("Произошла ошибка в конце сессии. Пожалуйста, попробуйте еще раз.", reply_markup=reply_markup_end)
+        return global_step_changer(STEP_END, update, context)
 
 # Ресет
 async def reset(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.message.from_user.id
-    user_sessions.pop(user_id, None)
-    await update.message.reply_text("Сессия сброшена. Введите код пары:",  reply_markup=ReplyKeyboardRemove())
-    return STEP_CODE
+    try:
+        user_id = update.message.from_user.id
+        user_sessions.pop(user_id, None)
+        context.user_data["users_actions"] = [None] * len(steps)
+        
+        await update.message.reply_text("Сессия сброшена. Введите код пары:",  reply_markup=ReplyKeyboardRemove())
+        return  global_step_changer(STEP_CODE, update, context)
+    except Exception as e:
+        logging.error(f"[BOT] Ошибка при сбросе сессии: {e}")
+        await update.message.reply_text("Произошла ошибка при сбросе сессии. Пожалуйста, попробуйте еще раз.", reply_markup=ReplyKeyboardRemove())
+        return global_step_changer(STEP_CODE, update, context)
 
 # Основная функция
 def main():
@@ -286,17 +228,15 @@ def main():
             STEP_CODE: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_code)],
             STEP_DEVICE: [MessageHandler(filters.TEXT & ~filters.COMMAND, choose_device)],
             STEP_MSG1: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_message1)],
-            STEP_MSG2: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_message2)],
             STEP_END: [MessageHandler(filters.TEXT & ~filters.COMMAND, ending)],
-            STEP_END: [MessageHandler(filters.TEXT & ~filters.COMMAND, ending)],
-            Q_1: [MessageHandler(filters.TEXT & ~filters.COMMAND, question_answer1)],
-            Q_2: [MessageHandler(filters.TEXT & ~filters.COMMAND, question_answer2)],
-            Q_3: [MessageHandler(filters.TEXT & ~filters.COMMAND, question_answer3)],
-            Q_4: [MessageHandler(filters.TEXT & ~filters.COMMAND, question_answer4)],
-            Q_5: [MessageHandler(filters.TEXT & ~filters.COMMAND, question_answer5)],
-            Q_6: [MessageHandler(filters.TEXT & ~filters.COMMAND, question_answer6)],
-            Q_7: [MessageHandler(filters.TEXT & ~filters.COMMAND, question_answer7)],
-
+            Q_1: [MessageHandler(filters.TEXT & ~filters.COMMAND, make_question_handler(Q_1))],
+            Q_2: [MessageHandler(filters.TEXT & ~filters.COMMAND, make_question_handler(Q_2))],
+            Q_3: [MessageHandler(filters.TEXT & ~filters.COMMAND, make_question_handler(Q_3))],
+            Q_4: [MessageHandler(filters.TEXT & ~filters.COMMAND, make_question_handler(Q_4))],
+            Q_5: [MessageHandler(filters.TEXT & ~filters.COMMAND, make_question_handler(Q_5))],
+            Q_6: [MessageHandler(filters.TEXT & ~filters.COMMAND, make_question_handler(Q_6))],
+            Q_7: [MessageHandler(filters.TEXT & ~filters.COMMAND, make_question_handler(Q_7))],
+            Q_8: [MessageHandler(filters.TEXT & ~filters.COMMAND, make_question_handler(Q_8))],
         },
         fallbacks=[CommandHandler("reset", reset)]
     )
