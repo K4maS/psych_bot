@@ -1,6 +1,6 @@
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove
 
-STEP_CODE, STEP_DEVICE,  Q_1, Q_2, Q_3, Q_4, Q_5, Q_6, Q_7, Q_8,STEP_MSG1, STEP_END, STEP_PSYCHO_CODE, STEP_PSYCHO_TABLE = range(14)
+STEP_START, STEP_CODE, STEP_DEVICE,  Q_1, Q_2, Q_3, Q_4, Q_5, Q_6, Q_7, Q_8,STEP_MSG1, STEP_END, STEP_PSYCHO_CODE, STEP_PSYCHO_TABLE = range(15)
 first_question = Q_1
 user_sessions = {}  # user_id: {code, row, device, is_first}
 
@@ -17,7 +17,8 @@ reply_markup_yes_or_no = ReplyKeyboardMarkup([['Да', 'Нет'],[back_action, r
 
 
 steps = [
-    {'question': 'Введите ваш код:', 'reply_markup': reply_markup_menu,  'component': STEP_CODE},
+    {'question': '...', 'reply_markup': reply_markup_menu,  'component': STEP_START},
+    {'question': 'Введите ваш код консультации:', 'reply_markup': reply_markup_menu,  'component': STEP_CODE},
     {'question': 'Подключение успешно. Укажите, какие проблемы вы собираетесь решать:',  'reply_markup': reply_markup , 'component': STEP_DEVICE},
     {'question': 'Ваш пол', 'reply_markup': reply_markup_gender , 'component': Q_1},
     {'question': 'Сколько Вам лет?', 'component': Q_2},

@@ -65,7 +65,7 @@ async def psych_set_table_link(update: Update, context: ContextTypes.DEFAULT_TYP
     psychologist_id = psycho_row['psychologist_id']  # <-- вот он, нужный id
 
     await update.message.reply_text(f'Ваш код психолога: {psychologist_id}')
-    return await reset(update, context)
+    return  global_step_changer(steps[STEP_START]['component'], update, context)
 
 async def get_psycho_code(update: Update, context: ContextTypes.DEFAULT_TYPE):
     code = update.message.text.strip()
@@ -278,6 +278,7 @@ def main():
     conv = ConversationHandler(
         entry_points=[CommandHandler("start", start)],
         states={
+            STEP_START: [MessageHandler(filters.TEXT & ~filters.COMMAND, start)],
             STEP_PSYCHO_CODE: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_psycho_code)],
             STEP_CODE: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_code)],
             STEP_DEVICE: [MessageHandler(filters.TEXT & ~filters.COMMAND, choose_device)],

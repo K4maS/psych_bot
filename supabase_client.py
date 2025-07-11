@@ -22,7 +22,7 @@ async def get_row_from_base(table, column, value):
     
 async def insert_row_to_base(table, data: dict):
     try:
-        response = supabase.table(table).insert(data).execute()
+        response = supabase.table(table).upsert(data, on_conflict="uid").execute()
         if response.data:
             return response.data[0]
         return None
