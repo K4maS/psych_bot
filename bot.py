@@ -16,6 +16,7 @@ from supabase_client import (
  )
 from telegram.error import TelegramError
 
+
 logging.basicConfig(filename="errors.log", level=logging.ERROR)
 
 async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -36,12 +37,24 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     print("[BOT] Пользователь начал ввод кода.")
     row = await get_row_from_patients_db(user_id)
     next_step = STEP_PSYCHO_CODE if row is None else STEP_CODE
-    
+
     await update.message.reply_text(steps[next_step]['question'],  reply_markup=ReplyKeyboardRemove())
     return   global_step_changer(steps[next_step]['component'], update, context)
 
 
- 
+async def psych_set_table_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    link = update.message.text.strip()
+    username = update.message.from_user.username
+    user_id = update.message.from_user.id
+    # row = await get_row_from_psycho_by_psychoid_db(link)
+    row = await insert_row_to_psycho_db(user_id, {'name': usename, 'psychologist_id': link})
+
+    if(row is None):
+        await update.message.reply_text('Проблемы с ссылкой')
+        return global_step_changer(steps[STEP_PSYCHO_TABLE]['component'], update, context)
+    psych_id = get_row_from_psycho_by_uid_db(user_id)
+    await update.message.reply_text(f'Ваш код психолога {psych_id}')
+    return await reset(update, context)
 
 async def get_psycho_code(update: Update, context: ContextTypes.DEFAULT_TYPE):
     code = update.message.text.strip()
@@ -256,6 +269,7 @@ def main():
             Q_6: [MessageHandler(filters.TEXT & ~filters.COMMAND, make_question_handler(Q_6))],
             Q_7: [MessageHandler(filters.TEXT & ~filters.COMMAND, make_question_handler(Q_7))],
             Q_8: [MessageHandler(filters.TEXT & ~filters.COMMAND, make_question_handler(Q_8))],
+            STEP_PSYCHO_TABLE: [MessageHandler(filters.TEXT & ~filters.COMMAND, psych_set_table_link)],
         },
         fallbacks=[CommandHandler("reset", reset)]
     )

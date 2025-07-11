@@ -50,6 +50,8 @@ async def get_row_from_psycho_by_db(uid):
 
 async def get_row_from_psycho_by_psychoid_db(psychologist_id):
     return await get_row_from_base(PSYHOLOGIST_TABLE, "psychologist_id", psychologist_id)
+async def get_row_from_psycho_by_uid_db(uid):
+    return await get_row_from_base(PSYHOLOGIST_TABLE, "uid", uid)
 
 async def insert_row_to_patients_db(uid, input_value):
     return await insert_row_to_base(PATIENTS_TABLE, {"uid": str(uid), **input_value}) 

@@ -36,7 +36,7 @@ def create_answers_format (steps, users_actions, context, left_cut, right_cut):
         users_actions = context.user_data.get("users_actions", [None] * len(steps))
         users_answers = users_actions[left_cut : right_cut]
         
-        text = '\n\n Вопросы заданные психологом пользователю: \n'
+        text = 'Вопросы заданные психологом пользователю: \n'
         for index, question in enumerate(questions):
             text += f'- {question["question"]}\n  - {users_answers[index]}\n'
         return text +'\n'
