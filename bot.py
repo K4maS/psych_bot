@@ -10,6 +10,7 @@ from supabase_client import (
     supabase,
     get_row_from_patients_db,
     get_row_from_psycho_by_psychoid_db,
+    get_row_from_psycho_by_uid_db,
     insert_row_to_patients_db,
     insert_row_to_psycho_db,
     get_table_linked_to_psycho,
@@ -38,7 +39,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     row = await get_row_from_patients_db(user_id)
     next_step = STEP_PSYCHO_CODE if row is None else STEP_CODE
 
-    await update.message.reply_text(steps[next_step]['question'],  reply_markup=ReplyKeyboardRemove())
+    await update.message.reply_text(steps[next_step]['question'],  reply_markup=reply_markup_menu)
     return   global_step_changer(steps[next_step]['component'], update, context)
 
 
@@ -46,25 +47,41 @@ async def psych_set_table_link(update: Update, context: ContextTypes.DEFAULT_TYP
     link = update.message.text.strip()
     username = update.message.from_user.username
     user_id = update.message.from_user.id
-    # row = await get_row_from_psycho_by_psychoid_db(link)
-    row = await insert_row_to_psycho_db(user_id, {'name': usename, 'psychologist_id': link})
 
-    if(row is None):
-        await update.message.reply_text('Проблемы с ссылкой')
+    # Вставка в базу
+    row = await insert_row_to_psycho_db(user_id, {'name': username, 'table': link})
+
+    if row is None:
+        await update.message.reply_text('Не удалось зарегистрироваться')
         return global_step_changer(steps[STEP_PSYCHO_TABLE]['component'], update, context)
-    psych_id = get_row_from_psycho_by_uid_db(user_id)
-    await update.message.reply_text(f'Ваш код психолога {psych_id}')
+
+    # Получение строки психолога по user_id
+    psycho_row = await get_row_from_psycho_by_uid_db(user_id)
+
+    if psycho_row is None or 'psychologist_id' not in psycho_row:
+        await update.message.reply_text('Ошибка при получении ID психолога')
+        return
+
+    psychologist_id = psycho_row['psychologist_id']  # <-- вот он, нужный id
+
+    await update.message.reply_text(f'Ваш код психолога: {psychologist_id}')
     return await reset(update, context)
 
 async def get_psycho_code(update: Update, context: ContextTypes.DEFAULT_TYPE):
     code = update.message.text.strip()
     username = update.message.from_user.username
     user_id = update.message.from_user.id
+
+    if code == 'Для психолога':
+        return global_step_changer(STEP_PSYCHO_TABLE, update, context)
+    elif code == 'Сменить код психолога':
+        return global_step_changer(STEP_PSYCHO_CODE, update, context)
+
     row = await get_row_from_psycho_by_psychoid_db(code)
 
     if row is None:
         await update.message.reply_text("Код психолога не найден. Пожалуйста, введите правильный код.")
-        return global_step_changer(STEP_PSYCHO_CODE, update, context)
+
     else:
         await insert_row_to_patients_db(user_id, {"psychologist_id": code, "name": username})
     await update.message.reply_text("Код психолога принят. Теперь введите код вашей пары:", reply_markup=ReplyKeyboardRemove())
@@ -85,6 +102,11 @@ async def get_code(update: Update, context: ContextTypes.DEFAULT_TYPE):
    
     code = update.message.text.strip()
     user_id = update.message.from_user.id
+
+    if code == 'Для психолога':
+        return global_step_changer(STEP_PSYCHO_TABLE, update, context)
+    elif code == 'Сменить код психолога':
+        return global_step_changer(STEP_PSYCHO_CODE, update, context)
 
     await write_spreadsheet_id_in_context(user_id, context)
     sheet_id = context.user_data.get("sheet_id")
