@@ -14,9 +14,19 @@ from supabase_client import (
     insert_row_to_psycho_db,
     get_table_linked_to_psycho,
  )
+from telegram.error import TelegramError
 
 logging.basicConfig(filename="errors.log", level=logging.ERROR)
- 
+
+async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
+    logging.error("Произошла ошибка:", exc_info=context.error)
+
+    if update and isinstance(update, Update) and update.message:
+        try:
+            await update.message.reply_text("🚫 Ошибка связи с сервером. Попробуйте ещё раз позже.")
+        except TelegramError:
+            pass  # если и это не сработает — не страшно
+
  
 # Начало сессии
 # Вызывается при команде /start
@@ -54,7 +64,6 @@ async def write_spreadsheet_id_in_context(user_id, context):
         sheet_link = await get_table_linked_to_psycho(user_id)
         sheet_id = extract_spreadsheet_id(sheet_link)
         context.user_data["sheet_id"] = sheet_id
-        print(f"[BOT] Извлечён ID таблицы: {sheet_id}")
         return sheet_id
 
 # Получение кода
@@ -63,17 +72,17 @@ async def get_code(update: Update, context: ContextTypes.DEFAULT_TYPE):
    
     code = update.message.text.strip()
     user_id = update.message.from_user.id
-    sheet_id = context.user_data.get("sheet_id")
-    
+
     await write_spreadsheet_id_in_context(user_id, context)
-    user_sheet_id = context.user_data.get("sheet_id")
-    row = find_row_by_code(code, user_sheet_id)
-    
+    sheet_id = context.user_data.get("sheet_id")
+
+    row = find_row_by_code(code, sheet_id)
+
     if row is None:
         await update.message.reply_text("Код не найден. Повторите ввод.")
         return  global_step_changer(STEP_CODE, update, context)
  
-    summary = read_column(row, SUMMARY)
+    summary = read_column(row, SUMMARY, sheet_id)
     if summary:
         await update.message.reply_text("Этот код уже использован. Введите другой код.")
         return  global_step_changer(STEP_CODE, update, context)
@@ -89,8 +98,11 @@ async def choose_device(update: Update, context: ContextTypes.DEFAULT_TYPE):
     choice = update.message.text
     user_id = update.message.from_user.id
     session = user_sessions[user_id]
+
+    sheet_id = context.user_data.get("sheet_id")
     row = session["row"]
     choice_lower = choice.lower()
+
     if "свои" in choice_lower:
         session["device"] = "one"
     elif "пары" in choice_lower:
@@ -99,7 +111,7 @@ async def choose_device(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return await reset(update, context)
     else:
         return  global_step_changer(STEP_DEVICE, update, context)
-    uid_1, msg_1, uid_2, msg_2 = read_messages(row)
+    uid_1, msg_1, uid_2, msg_2 = read_messages(row, sheet_id)
 
     if session["device"] == "two" and msg_1 and uid_1:
         await update.message.reply_text("Ваш партнер ввел сообщение, ваша очередь:", reply_markup=reply_markup_back_reset)
@@ -113,13 +125,12 @@ async def choose_device(update: Update, context: ContextTypes.DEFAULT_TYPE):
  
 # Первое сообщение
 async def get_message1(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    print(f"[BOT] Message1: {update.message.text}")
+
     user_id = update.message.from_user.id
     session = user_sessions[user_id]
-
+    sheet_id = context.user_data.get("sheet_id")
     row = session["row"]
     device = session["device"]
-    user_sheet_id = context.user_data.get("sheet_id")
 
     message = update.message.text.strip()
     is_first = True
@@ -127,16 +138,16 @@ async def get_message1(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     questions_cut = Q_3 if device == "one" else STEP_MSG1
     message_with_answers = create_answers_format(steps, users_actions, context, Q_1, questions_cut ) + message
-    
+    print(f"[BOT] Message1: {update.message.text}")
     if message == reset_action or message == back_action:
         return await navigation(message, update, context)
     
-    uid_1, msg_1, uid_2, msg_2 = read_messages(row)
+    uid_1, msg_1, uid_2, msg_2 = read_messages(row, sheet_id)
 
     if msg_1 and uid_1 and device != "one":
         is_first = False
-    
-    write_message(row, user_id, message_with_answers, is_first, user_sheet_id)
+    print(f'get_message sheet id {sheet_id}')
+    write_message(row, user_id, message_with_answers, sheet_id, is_first)
     
     uid_2 = update.message.chat.id
     msg_2 = message_with_answers
@@ -149,9 +160,10 @@ async def get_message1(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def do_analysis(update: Update, context: ContextTypes.DEFAULT_TYPE, device, row):
     await update.message.reply_text("Делаем анализ, подождите",  reply_markup=ReplyKeyboardRemove())
-    
+    sheet_id = context.user_data.get("sheet_id")
+
     try:
-        uid_1, msg_1, uid_2, msg_2 = read_messages(row)
+        uid_1, msg_1, uid_2, msg_2 = read_messages(row, sheet_id)
 
         if (msg_1 and msg_2) or  msg_1 and device == "one":
            await analysis_and_send_message_to_users(uid_1, msg_1, uid_2, msg_2, row, context, update)
@@ -164,35 +176,36 @@ async def do_analysis(update: Update, context: ContextTypes.DEFAULT_TYPE, device
 
 # Анализ сообщения
 async def analysis_and_send_message_to_users(uid_1, msg_1, uid_2, msg_2, row, context, update):
+    sheet_id = context.user_data.get("sheet_id")
     try:
-        about_user1 = call_gpt_user(msg_1)
-        write_user1_analysis(row, about_user1)
-        user_sheet_id = context.user_data.get("sheet_id") 
-        print(user_sheet_id)
+        about_user1 = call_gpt_user(sheet_id, msg_1)
+        write_user1_analysis(row, about_user1, sheet_id)
+
+        print(sheet_id)
         print(f"[GPT] Анализируем пользователя: {msg_2}")
         if msg_1 and not msg_2:
             print(f"[GPT] Анализируем пользователя: {uid_1}")
-            summary = call_gpt_single(msg_1)
-            write_summary(row, summary, user_sheet_id)
+            summary = call_gpt_single(sheet_id, msg_1)
+            write_summary(row, summary, sheet_id)
             
-            to_pair_rec = call_gpt_to_single(msg_1)
-            write_recommendation(row, to_pair_rec, user_sheet_id)
+            to_pair_rec = call_gpt_to_single(sheet_id, msg_1)
+            write_recommendation(row, to_pair_rec, sheet_id)
             
-            to_psych_rec = call_gpt_single_to_psyhologist(msg_1)
-            write_recommendation_to_apsychologist(row, to_psych_rec, user_sheet_id)
+            to_psych_rec = call_gpt_single_to_psychologist(sheet_id, msg_1)
+            write_recommendation_to_psychologist(row, to_psych_rec, sheet_id)
         else: 
             print(f"[GPT] Анализируем пару: {uid_1} и {uid_2}")
-            about_user2 = call_gpt_user(msg_2)
-            write_user2_analysis(row, about_user2, user_sheet_id)
+            about_user2 = call_gpt_user(sheet_id, msg_2)
+            write_user2_analysis(row, about_user2, sheet_id)
             
-            summary = call_gpt_pair(msg_1, msg_2)
-            write_summary(row, summary, user_sheet_id)
+            summary = call_gpt_pair(sheet_id, msg_1, msg_2)
+            write_summary(row, summary, sheet_id)
             
-            to_pair_rec = call_gpt_to_pair(msg_1, msg_2)
-            write_recommendation(row, to_pair_rec, user_sheet_id)
+            to_pair_rec = call_gpt_to_pair(sheet_id, msg_1, msg_2)
+            write_recommendation(row, to_pair_rec, sheet_id)
             
-            to_psych_rec = call_gpt_pair_to_psyhologist(msg_1, msg_2)
-            write_recommendation_to_apsychologist(row, to_psych_rec, user_sheet_id)
+            to_psych_rec = call_gpt_pair_to_psyhologist(sheet_id, msg_1, msg_2)
+            write_recommendation_to_psychologist(row, to_psych_rec, sheet_id)
         
         if uid_1:
             await context.bot.send_message(chat_id=int(uid_1), text="✅ Анализ завершён. Психолог получил резюме.", reply_markup=reply_markup_end)
@@ -247,7 +260,10 @@ def main():
         fallbacks=[CommandHandler("reset", reset)]
     )
 
-    app.add_handler(conv) 
+    app.add_handler(conv)
+
+    app.add_error_handler(error_handler)
+
     print("[СТАТУС] Бот успешно запущен.")
     app.run_polling()
    

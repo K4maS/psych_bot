@@ -17,9 +17,10 @@ async def reset(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         user_id = update.message.from_user.id
         user_sessions.pop(user_id, None)
+        user_sessions.pop(user_id, None)
         context.user_data["users_actions"] = [None] * len(steps)
         
-        await update.message.reply_text("Сессия сброшена. Введите код пары:",  reply_markup=ReplyKeyboardRemove())
+        await update.message.reply_text("Введите ваш код авторизации:",  reply_markup=ReplyKeyboardRemove())
         return  global_step_changer(STEP_CODE, update, context)
     except Exception as e:
         logging.error(f"[BOT] Ошибка при сбросе сессии: {e}")

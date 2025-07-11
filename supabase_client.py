@@ -13,7 +13,6 @@ PATIENTS_TABLE = "patients"
 async def get_row_from_base(table, column, value):
     try:
         response = supabase.table(table).select("*").eq(column, value).execute()
-        print(response)
         if response.data:
             return response.data[0]
         return None
@@ -23,11 +22,7 @@ async def get_row_from_base(table, column, value):
     
 async def insert_row_to_base(table, data: dict):
     try:
-    
-        print("[DEBUG] Вставляем:", data)
         response = supabase.table(table).insert(data).execute()
-        print("[DEBUG] Ответ от Supabase:", response)
-        print("[DEBUG] Вставлено:", response.data)
         if response.data:
             return response.data[0]
         return None

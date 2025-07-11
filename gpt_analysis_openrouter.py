@@ -21,9 +21,9 @@ HEADERS = {
     "X-Title": "PsychologyBot",
 }
 
-def call_gpt(value, extra_prefix):
+def call_gpt(sheet_id, value, extra_prefix):
     
-    prompt_prefix = get_prompt_from_sheet() or (
+    prompt_prefix = get_prompt_from_sheet(sheet_id) or (
         "Ты профессиональный психолог."
     )
      
@@ -58,38 +58,38 @@ def call_gpt(value, extra_prefix):
     return "Ошибка: ни одна модель GPT не сработала."
 
 # Парная консультация с психологом
-def call_gpt_pair(message_1, message_2):
+def call_gpt_pair(sheet_id, message_1, message_2):
     extra_prefix = "Проанализируй сообщения двух партнёров и составь краткое резюме для психолога. Не надо рекомендаций, напиши пару предложений"
     messages =  f"Партнёр 1: {message_1}\n\nПартнёр 2: {message_2}"
-    return call_gpt(messages, extra_prefix)
+    return call_gpt(sheet_id, messages, extra_prefix)
 
-def call_gpt_to_pair(message_1, message_2):
+def call_gpt_to_pair(sheet_id, message_1, message_2):
     extra_prefix = "Проанализируй сообщения двух партнёров и составь краткое резюме c советами для пары. Не надо описывать, просто несколько предложений с рекомендациями."
     messages =  f"Партнёр 1: {message_1}\n\nПартнёр 2: {message_2}"
-    return call_gpt(messages, extra_prefix)
+    return call_gpt(sheet_id, messages, extra_prefix)
 
-def call_gpt_pair_to_psyhologist(message_1, message_2):
+def call_gpt_pair_to_psyhologist( sheet_id, message_1, message_2):
     extra_prefix = "Проанализируй сообщения двух партнёров и составь краткое резюме с советами для психолога. Напиши только советы психологу для работы с данной парой"
     messages =  f"Партнёр 1: {message_1}\n\nПартнёр 2: {message_2}"
-    return call_gpt(messages, extra_prefix)
+    return call_gpt(sheet_id, messages, extra_prefix)
 
-def call_gpt_user(user_message):
+def call_gpt_user(sheet_id, user_message):
     extra_prefix = "Проанализируй сообщения партнёра и составь краткое резюме для психолога. Опиши только одного пратнера, не надо описывать прару. Нам интересен только конкретный партнер"
     message = f"Партнёр: {user_message}"
-    return call_gpt(message, extra_prefix)
+    return call_gpt(sheet_id, user_message, extra_prefix)
 
 # Личная консультация с психологом
-def call_gpt_single(message):
+def call_gpt_single(sheet_id, message):
     extra_prefix = "Проанализируй сообщения конкретного пользователя и составь краткое резюме для психолога. Не надо рекомендаций, напиши несколько предложений"
     messages =  f"Пользователь: {message}"
-    return call_gpt(messages, extra_prefix)
+    return call_gpt(sheet_id, messages, extra_prefix)
 
-def call_gpt_to_single(message):
+def call_gpt_to_single(sheet_id, message):
     extra_prefix = "Проанализируй сообщения конкретного пользователя и составь краткое резюме c советами для конкретного пользователя. Не надо описывать, просто несколько предложений с рекомендациями."
     messages =  f"Пользователь: {message}"
-    return call_gpt(messages, extra_prefix)
+    return call_gpt(sheet_id, messages, extra_prefix)
 
-def call_gpt_single_to_psyhologist(message):
+def call_gpt_single_to_psychologist(sheet_id, message):
     extra_prefix = "Проанализируй сообщения конкретного пользователя и составь краткое резюме с советами для психолога. Напиши только советы психологу для работы с данным поциентом"
     messages =  f"Пользователь: {message}"
-    return call_gpt(messages, extra_prefix)
+    return call_gpt(sheet_id, messages, extra_prefix)
