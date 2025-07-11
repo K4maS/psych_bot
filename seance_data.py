@@ -1,13 +1,13 @@
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove
 
-STEP_PSYCHO_CODE, STEP_CODE, STEP_DEVICE,  Q_1, Q_2, Q_3, Q_4, Q_5, Q_6, Q_7, Q_8,STEP_MSG1, STEP_END = range(13)
+STEP_CODE, STEP_DEVICE,  Q_1, Q_2, Q_3, Q_4, Q_5, Q_6, Q_7, Q_8,STEP_MSG1, STEP_END, STEP_PSYCHO_CODE = range(13)
 first_question = Q_1
 user_sessions = {}  # user_id: {code, row, device, is_first}
 
 back_action = "Назад"
 reset_action = "Сначала"
 
-reply_markup = ReplyKeyboardMarkup([["Свои проблемы", "Свои проблемы", "Сначала"]], resize_keyboard=True)
+reply_markup = ReplyKeyboardMarkup([["Проблемы пары", "Свои проблемы", "Сначала"]], resize_keyboard=True)
 reply_markup_back_reset = ReplyKeyboardMarkup([[back_action, reset_action]], resize_keyboard=True)
 reply_markup_gender = ReplyKeyboardMarkup([['Мужской', 'Женский'],[back_action, reset_action]], resize_keyboard=True)
 
@@ -16,7 +16,6 @@ reply_markup_yes_or_no = ReplyKeyboardMarkup([['Да', 'Нет'],[back_action, r
 
 
 steps = [
-    {'question': 'Введите код психолога:', 'reply_markup': ReplyKeyboardRemove(),  'component': STEP_PSYCHO_CODE},
     {'question': 'Введите ваш код:', 'reply_markup': ReplyKeyboardRemove(),  'component': STEP_CODE},
     {'question': 'Подключение успешно. Укажите, какие проблемы вы собираетесь решать:',  'reply_markup': reply_markup , 'component': STEP_DEVICE},
     {'question': 'Ваш пол', 'reply_markup': reply_markup_gender , 'component': Q_1},
@@ -29,4 +28,5 @@ steps = [
     {'question': 'Что не приемлемо для вас в отношениях?', 'component': Q_8},
     {'question': 'Введите ваше сообщение:', 'component': STEP_MSG1},
     {'question': 'Сессия прошла успешно', 'component': STEP_END},
+    {'question': 'Введите код психолога:', 'reply_markup': ReplyKeyboardRemove(),  'component': STEP_PSYCHO_CODE},
 ]

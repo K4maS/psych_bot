@@ -56,9 +56,21 @@ async def get_row_from_psycho_by_db(uid):
 async def get_row_from_psycho_by_psychoid_db(psychologist_id):
     return await get_row_from_base(PSYHOLOGIST_TABLE, "psychologist_id", psychologist_id)
 
-async def insert_row_to_patients_db(user_id, input_value):
-    return await insert_row_to_base(PATIENTS_TABLE, {"uid": str(user_id), **input_value}) 
+async def insert_row_to_patients_db(uid, input_value):
+    return await insert_row_to_base(PATIENTS_TABLE, {"uid": str(uid), **input_value}) 
 
-async def insert_row_to_psycho_db(user_id, input_value):
-    return await insert_row_to_base(PSYHOLOGIST_TABLE, {"uid": str(user_id), **input_value} )
+async def insert_row_to_psycho_db(uid, input_value):
+    return await insert_row_to_base(PSYHOLOGIST_TABLE, {"uid": str(uid), **input_value} )
     
+async def joint_table(uid):
+    response = supabase \
+    .from_("patients") \
+    .select("*, psychologist:psychologists(*)") \
+    .eq("uid", uid) \
+    .execute()
+    if response.data:
+        return response.data[0]
+    
+async def get_table_linked_to_psycho(uid):
+    data = await joint_table(uid)
+    return  data.get("psychologist", {}).get("table")

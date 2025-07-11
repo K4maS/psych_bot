@@ -1,4 +1,4 @@
-from telegram import Update, ReplyKeyboardMarkup, KeyboardButton
+from telegram import Update, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
 from telegram.ext import ContextTypes
 import logging
 from seance_data import (
@@ -8,8 +8,24 @@ from seance_data import (
     reset_action,
     back_action,
     reply_markup_back_reset,
-    user_sessions
+    user_sessions, 
+    STEP_CODE
 )
+ 
+ # Ресет
+async def reset(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    try:
+        user_id = update.message.from_user.id
+        user_sessions.pop(user_id, None)
+        context.user_data["users_actions"] = [None] * len(steps)
+        
+        await update.message.reply_text("Сессия сброшена. Введите код пары:",  reply_markup=ReplyKeyboardRemove())
+        return  global_step_changer(STEP_CODE, update, context)
+    except Exception as e:
+        logging.error(f"[BOT] Ошибка при сбросе сессии: {e}")
+        await update.message.reply_text("Произошла ошибка при сбросе сессии. Пожалуйста, попробуйте еще раз.", reply_markup=ReplyKeyboardRemove())
+        return global_step_changer(STEP_CODE, update, context)
+
 
 # Функция для создания формата ответов
 # Используется для форматирования вопросов и ответов пользователя
@@ -70,23 +86,28 @@ def get_user_id(update):
 async def question_answer_base(update, context,  question_index):
     try:
         user_id = get_user_id(update)
-        session = user_sessions[user_id]
+        session = user_sessions.get(user_id)
+        if session is None:
+            await update.message.reply_text("Сессия не найдена. Начните сначала /start")
+            return await reset(update, context)
+
         row = session["row"]
         device = session["device"]
         message = update.message.text.strip()
+
         users_actions = context.user_data.get("users_actions", [None] * len(steps))
         users_actions[question_index] = message
         context.user_data["users_actions"] = users_actions  # сохраняем
-      
-        if device == "one" and question_index == Q_2: 
+
+        if message == reset_action or message == back_action:
+            return await navigation(message, update, context)
+
+        if device == "one" and question_index == Q_2:
             await update.message.reply_text("Опишите ваши проблемы:")
             return  global_step_changer(STEP_MSG1, update, context)
 
-        if message == reset_action or message == back_action:
-            return await navigation(message, update, context)    
         try:
             next_question = steps[question_index + 1]
-            
             await message_replay(next_question, update, context)
             
             if 'component' in next_question or len(steps) <= question_index:
@@ -111,6 +132,7 @@ async def message_replay(step, update, context):
         return await update.message.reply_text(question_text,  reply_markup=reply_markup if reply_markup else reply_markup_back_reset)
     except Exception as e:
         logging.error(f"Ошибка при отправке сообщения: {e}")
+        return None
     
 # Функция для создания обработчика вопросов
 # Используется для создания обработчиков для каждого вопроса
