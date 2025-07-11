@@ -1,5 +1,5 @@
 import logging
-from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
+from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove, BotCommand
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes, ConversationHandler
 from config import TELEGRAM_BOT_TOKEN
 from sheets import *
@@ -40,7 +40,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     next_step = STEP_PSYCHO_CODE if row is None else STEP_CODE
 
     await update.message.reply_text(steps[next_step]['question'],  reply_markup=reply_markup_menu)
-    return   global_step_changer(steps[next_step]['component'], update, context)
+    return global_step_changer(steps[next_step]['component'], update, context)
 
 
 async def psych_set_table_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -60,12 +60,12 @@ async def psych_set_table_link(update: Update, context: ContextTypes.DEFAULT_TYP
 
     if psycho_row is None or 'psychologist_id' not in psycho_row:
         await update.message.reply_text('Ошибка при получении ID психолога')
-        return
+        return global_step_changer(steps[STEP_PSYCHO_TABLE]['component'], update, context)
 
     psychologist_id = psycho_row['psychologist_id']  # <-- вот он, нужный id
 
     await update.message.reply_text(f'Ваш код психолога: {psychologist_id}')
-    return  global_step_changer(steps[STEP_START]['component'], update, context)
+    # return  global_step_changer(steps[STEP_START]['component'], update, context)
 
 async def get_psycho_code(update: Update, context: ContextTypes.DEFAULT_TYPE):
     code = update.message.text.strip()
@@ -270,6 +270,19 @@ async def ending(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return global_step_changer(STEP_END, update, context)
 
 
+# Установка меню-команд
+async def set_menu_commands(app):
+    commands = [
+        BotCommand("start", "Запустить бота"),
+        BotCommand("reset", "Сбросить данные"),
+        BotCommand("link", "Записать/перезаписать код психолога")
+    ]
+    await app.bot.set_my_commands(commands)
+
+async def link(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text(steps[STEP_PSYCHO_TABLE]['question'], reply_markup=reply_markup_end)
+    return global_step_changer(STEP_PSYCHO_TABLE, update, context)
+
 # Основная функция
 def main():
     print("[СТАТУС] Бот запускается...")
@@ -297,9 +310,15 @@ def main():
         fallbacks=[CommandHandler("reset", reset)]
     )
 
+
     app.add_handler(conv)
 
     app.add_error_handler(error_handler)
+
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("reset", reset))
+    app.add_handler(CommandHandler("link", link))
+    app.post_init = set_menu_commands
 
     print("[СТАТУС] Бот успешно запущен.")
     app.run_polling()

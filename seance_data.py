@@ -31,5 +31,5 @@ steps = [
     {'question': 'Введите ваше сообщение:', 'component': STEP_MSG1},
     {'question': 'Сессия прошла успешно', 'component': STEP_END},
     {'question': 'Введите код психолога:', 'reply_markup': ReplyKeyboardRemove(),  'component': STEP_PSYCHO_CODE},
-    {'question': 'Введите код психолога:', 'reply_markup': reply_markup_to_main,  'component': STEP_PSYCHO_TABLE},
+    {'question': 'Здесь психолог должен ввести ссылку на свою таблицу(надо будет сделать валидацию):', 'reply_markup': reply_markup_to_main,  'component': STEP_PSYCHO_TABLE},
 ]
