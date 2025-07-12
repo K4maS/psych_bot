@@ -1,5 +1,6 @@
 from supabase import create_client, Client
 from config import SUPABASE_URL, SUPABASE_ANON_KEY
+from typing import Optional, Union, Dict, List
 import logging
 
 
@@ -68,6 +69,9 @@ async def joint_table(uid):
     if response.data:
         return response.data[0]
     
-async def get_table_linked_to_psycho(uid):
+
+async def get_table_linked_to_psycho(uid: int) -> Optional[str]:
     data = await joint_table(uid)
-    return  data.get("psychologist", {}).get("table")
+    if not data or not isinstance(data, dict):
+        return None
+    return data.get("psychologist", {}).get("table")

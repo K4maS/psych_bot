@@ -17,8 +17,8 @@ reply_markup_yes_or_no = ReplyKeyboardMarkup([['Да', 'Нет'],[back_action, r
 
 
 steps = [
-    {'question': '...', 'reply_markup': reply_markup_menu,  'component': STEP_START},
-    {'question': 'Введите ваш код консультации:', 'reply_markup': reply_markup_menu,  'component': STEP_CODE},
+    {'question': '...Пока в данном шаге надо ввести что то, чтобы пройди дальше...', 'reply_markup': ReplyKeyboardRemove(),  'component': STEP_START},
+    {'question': 'Введите ваш код консультации:', 'reply_markup': ReplyKeyboardRemove(),  'component': STEP_CODE},
     {'question': 'Подключение успешно. Укажите, какие проблемы вы собираетесь решать:',  'reply_markup': reply_markup , 'component': STEP_DEVICE},
     {'question': 'Ваш пол', 'reply_markup': reply_markup_gender , 'component': Q_1},
     {'question': 'Сколько Вам лет?', 'component': Q_2},
@@ -31,5 +31,5 @@ steps = [
     {'question': 'Введите ваше сообщение:', 'component': STEP_MSG1},
     {'question': 'Сессия прошла успешно', 'component': STEP_END},
     {'question': 'Введите код психолога:', 'reply_markup': ReplyKeyboardRemove(),  'component': STEP_PSYCHO_CODE},
-    {'question': 'Здесь психолог должен ввести ссылку на свою таблицу(надо будет сделать валидацию):', 'reply_markup': reply_markup_to_main,  'component': STEP_PSYCHO_TABLE},
+    {'question': 'Здесь психолог должен ввести ссылку на свою таблицу(надо будет сделать валидацию):', 'reply_markup': ReplyKeyboardRemove(),  'component': STEP_PSYCHO_TABLE},
 ]
