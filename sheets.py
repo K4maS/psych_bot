@@ -41,7 +41,7 @@ def find_row_by_code(code, sheet_id):
     except ValueError:
         return None
 
-def get_prompt_from_sheet(sheet_id):
+def get_prompt_from_sheet(sheet_id = spreadsheet_id):
     try:
         prompt_sheet = get_worksheet(sheet_id, PROMPT_SHEET_NAME)
         prompt = prompt_sheet.acell("A1").value

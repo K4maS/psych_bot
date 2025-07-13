@@ -15,7 +15,7 @@ models = [
 ]
 
 def call_gpt(message_1, message_2):
-    prompt_prefix = get_prompt_from_sheet() or "На основе сообщений двух партнёров проведи психологический анализ их коммуникации, используя доказательные подходы. Ответ выдай в виде краткого резюме психологу."
+    prompt_prefix = get_prompt_from_sheet() or "На основе сообщений проведи психологический анализ, используя доказательные подходы. Ответ выдай в виде краткого резюме."
 
     system_prompt = {
         "role": "system",
@@ -41,4 +41,5 @@ def call_gpt(message_1, message_2):
         except Exception as e:
             logging.error(f"[GPT] Ошибка с моделью {model['name']}: {e}")
             print(f"[GPT] Ошибка модели {model['name']}: {e}")
+            raise
     return "Ошибка: ни одна модель GPT не сработала."

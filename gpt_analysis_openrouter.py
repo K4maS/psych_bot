@@ -23,7 +23,7 @@ HEADERS = {
 
 def call_gpt(sheet_id, value, extra_prefix):
     
-    prompt_prefix = get_prompt_from_sheet(sheet_id) or (
+    prompt_prefix = get_prompt_from_sheet() or (
         "Ты профессиональный психолог."
     )
      

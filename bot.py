@@ -1,6 +1,6 @@
 import logging
 from typing import Optional, Union
-from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove, BotCommand
+from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove, BotCommand, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import (
     ApplicationBuilder,
     CommandHandler,
@@ -18,17 +18,21 @@ from util import (
     message_replay,
     navigation,
     reset,
+    first_step_handler,
+    is_valid_sheet_url
 )
 from seance_data import *
 from gpt_analysis_openrouter import *
 from supabase_client import (
     supabase,
-    get_row_from_patients_db,
     get_row_from_psycho_by_psychoid_db,
     get_row_from_psycho_by_uid_db,
+    get_row_from_patients_db,
     insert_row_to_patients_db,
     insert_row_to_psycho_db,
     get_table_linked_to_psycho,
+    get_credits_of_psycho,
+    decrement_credits,
 )
 from telegram.error import TelegramError
 
@@ -40,7 +44,7 @@ async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> N
 
     if update and isinstance(update, Update) and update.message:
         try:
-            await update.message.reply_text("🚫 Ошибка связи с сервером. Попробуйте ещё раз позже.")
+            await update.message.reply_text("🚫 Ошибка связи с сервером.")
         except TelegramError:
             pass  # если и это не сработает — не страшно
 
@@ -49,15 +53,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     code: str = update.message.text.strip()
     user_id: int = update.message.from_user.id
     print("[BOT] Пользователь начал ввод кода.")
-    row: Optional[dict] = await get_row_from_patients_db(user_id)
-    next_step: int = STEP_PSYCHO_CODE if row is None else STEP_CODE
 
-    await update.message.reply_text(steps[next_step]['question'], reply_markup=ReplyKeyboardRemove())
-    return global_step_changer(steps[next_step]['component'], update, context)
+    return await first_step_handler(update, context, user_id)
 
 
-def is_valid_sheet_url(url: str) -> bool:
-    return re.match(r'^https:\/\/docs\.google\.com\/spreadsheets\/d\/[a-zA-Z0-9-_]+', url) is not None
+
 
 
 async def psych_set_table_link(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Optional[int]:
@@ -69,20 +69,24 @@ async def psych_set_table_link(update: Update, context: ContextTypes.DEFAULT_TYP
         await update.message.reply_text("⚠️ Это не похоже на ссылку на Google Таблицу. Вставьте корректную ссылку.")
         return global_step_changer(steps[STEP_PSYCHO_TABLE]['component'], update, context)
 
-    row = await insert_row_to_psycho_db(user_id, {'name': username, 'table': link})
+    try:
+        row = await insert_row_to_psycho_db(user_id, {'name': username, 'table': link, 'credits': 1})
+        psycho_row = await get_row_from_psycho_by_uid_db(user_id)
 
-    if row is None:
-        await update.message.reply_text('Не добавить/поменять ссылку на таблицу')
-        return global_step_changer(steps[STEP_PSYCHO_TABLE]['component'], update, context)
+        if row is None:
+            await update.message.reply_text('Не добавить/поменять ссылку на таблицу')
+            return global_step_changer(steps[STEP_PSYCHO_TABLE]['component'], update, context)
 
-    psycho_row = await get_row_from_psycho_by_uid_db(user_id)
+        if psycho_row is None or 'psychologist_id' not in psycho_row:
+            await update.message.reply_text('Ошибка при получении ID психолога')
+            return global_step_changer(steps[STEP_PSYCHO_TABLE]['component'], update, context)
 
-    if psycho_row is None or 'psychologist_id' not in psycho_row:
-        await update.message.reply_text('Ошибка при получении ID психолога')
-        return global_step_changer(steps[STEP_PSYCHO_TABLE]['component'], update, context)
-
-    psychologist_id: str = psycho_row['psychologist_id']
-    await update.message.reply_text(f'Ваш код психолога: {psychologist_id}')
+        psychologist_id: str = psycho_row['psychologist_id']
+        credits: str = psycho_row['credits']
+        await update.message.reply_text(f'Ваш код психолога: {psychologist_id} \n У вас {credits} кредитов')
+    except Exception as e:
+        logging.error(e)
+        await update.message.reply_text('Ошибка базы данных')
     # Если нужен возврат шага, раскомментировать
     # return global_step_changer(steps[STEP_START]['component'], update, context)
 
@@ -106,34 +110,43 @@ async def get_psycho_code(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
 
 async def write_spreadsheet_id_in_context(user_id: int, context: ContextTypes.DEFAULT_TYPE) -> Optional[str]:
-    sheet_link: Optional[str] = await get_table_linked_to_psycho(user_id)
-    if sheet_link is None:
-        return None
-    sheet_id: Optional[str] = extract_spreadsheet_id(sheet_link)
-    if sheet_id:
-        context.user_data["sheet_id"] = sheet_id
-    return sheet_id
+    try:
+        sheet_link: Optional[str] = await get_table_linked_to_psycho(user_id)
+        credits: Optional[str] = await get_credits_of_psycho(user_id)
+        if sheet_link is None:
+            return None
+        sheet_id: Optional[str] = extract_spreadsheet_id(sheet_link)
+        if sheet_id:
+            context.user_data["sheet_id"] = sheet_id
+        return sheet_id, credits
+    except Exception as e:
+        logging.error(e)
+        await update.message.reply_text('Ошибка базы данных')
 
 
 async def get_code(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Optional[int]:
     code: str = update.message.text.strip()
     user_id: int = update.message.from_user.id
 
-    if code == 'Для психолога':
-        return global_step_changer(STEP_PSYCHO_TABLE, update, context)
-    elif code == 'Сменить код психолога':
-        return global_step_changer(STEP_PSYCHO_CODE, update, context)
-
     await write_spreadsheet_id_in_context(user_id, context)
     sheet_id: Optional[str] = context.user_data.get("sheet_id")
 
-    row = find_row_by_code(code, sheet_id)
+    try:
+        row = find_row_by_code(code, sheet_id)
+    except Exception as e:
+        error_text = f"⚠️ Произошла ошибка при работе с таблицей:\n{str(e)}"
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=error_text)
 
     if row is None:
         await update.message.reply_text("Код не найден. Повторите ввод.")
         return global_step_changer(STEP_CODE, update, context)
 
-    summary = read_column(row, SUMMARY, sheet_id)
+    try:
+        summary = read_column(row, SUMMARY, sheet_id)
+    except Exception as e:
+        error_text = f"⚠️ Произошла ошибка при работе с таблицей:\n{str(e)}"
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=error_text)
+
     if summary:
         await update.message.reply_text("Этот код уже использован. Введите другой код.")
         return global_step_changer(STEP_CODE, update, context)
@@ -162,7 +175,7 @@ async def choose_device(update: Update, context: ContextTypes.DEFAULT_TYPE) -> O
     else:
         return global_step_changer(STEP_DEVICE, update, context)
 
-    uid_1, msg_1, uid_2, msg_2 = read_messages(row, sheet_id)
+    uid_1, msg_1, uid_2, msg_2 = await read_messages_except(row, sheet_id)
 
     if session["device"] == "two" and msg_1 and uid_1:
         await update.message.reply_text("Ваш партнер ввел сообщение, ваша очередь:",
@@ -194,12 +207,16 @@ async def get_message1(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Op
     if message == reset_action or message == back_action:
         return await navigation(message, update, context)
 
-    uid_1, msg_1, uid_2, msg_2 = read_messages(row, sheet_id)
+    uid_1, msg_1, uid_2, msg_2 = await read_messages_except(row, sheet_id)
 
     if msg_1 and uid_1 and device != "one":
         is_first = False
     print(f'get_message sheet id {sheet_id}')
-    write_message(row, user_id, message_with_answers, sheet_id, is_first)
+    try:
+        write_message(row, user_id, message_with_answers, sheet_id, is_first)
+    except Exception as e:
+        error_text = f"⚠️ Произошла ошибка при работе с таблицей:\n{str(e)}"
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=error_text)
 
     uid_2 = update.message.chat.id
     msg_2 = message_with_answers
@@ -213,8 +230,9 @@ async def do_analysis(update: Update, context: ContextTypes.DEFAULT_TYPE, device
     await update.message.reply_text("Делаем анализ, подождите", reply_markup=ReplyKeyboardRemove())
     sheet_id: Optional[str] = context.user_data.get("sheet_id")
 
+    uid_1, msg_1, uid_2, msg_2 = await read_messages_except(row, sheet_id)
     try:
-        uid_1, msg_1, uid_2, msg_2 = read_messages(row, sheet_id)
+
 
         if (msg_1 and msg_2) or (msg_1 and device == "one"):
             await analysis_and_send_message_to_users(uid_1, msg_1, uid_2, msg_2, row, context, update)
@@ -226,6 +244,14 @@ async def do_analysis(update: Update, context: ContextTypes.DEFAULT_TYPE, device
     return global_step_changer(STEP_END, update, context)
 
 
+async def  read_messages_except(row, sheet_id):
+    try:
+        uid_1, msg_1, uid_2, msg_2 = read_messages(row, sheet_id)
+        return uid_1, msg_1, uid_2, msg_2
+    except Exception as e:
+        error_text = f"⚠️ Произошла ошибка при работе с таблицей:\n{str(e)}"
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=error_text)
+
 async def analysis_and_send_message_to_users(
         uid_1: Optional[int],
         msg_1: Optional[str],
@@ -235,8 +261,25 @@ async def analysis_and_send_message_to_users(
         context: ContextTypes.DEFAULT_TYPE,
         update: Update,
 ) -> None:
+    credits = await get_credits_of_psycho(uid_1)
+    if credits <= 0:
+        if uid_1:
+            await context.bot.send_message(
+                chat_id=int(uid_1),
+                text="Недостаточно кредитов.",
+                reply_markup=reply_markup_end,
+            )
+        if uid_2 and uid_2 != uid_1:
+            await context.bot.send_message(
+                chat_id=int(uid_2),
+                text="Недостаточно кредитов.",
+                reply_markup=reply_markup_end,
+            )
+
     sheet_id: Optional[str] = context.user_data.get("sheet_id")
     try:
+
+
         about_user1 = call_gpt_user(sheet_id, msg_1)
         write_user1_analysis(row, about_user1, sheet_id)
 
@@ -266,6 +309,9 @@ async def analysis_and_send_message_to_users(
             to_psych_rec = call_gpt_pair_to_psyhologist(sheet_id, msg_1, msg_2)
             write_recommendation_to_psychologist(row, to_psych_rec, sheet_id)
 
+        credits_now = await decrement_credits(uid_1)
+        print(f'credits_now: {credits_now}')
+
         if uid_1:
             await context.bot.send_message(
                 chat_id=int(uid_1),
@@ -282,7 +328,7 @@ async def analysis_and_send_message_to_users(
 
     except Exception as e:
         logging.error(f"[GPT] Ошибка анализа: {e}")
-        await update.message.reply_text("Произошла ошибка при анализе. Пожалуйста, попробуйте позже.",
+        await update.message.reply_text("Произошла ошибка при анализе.",
                                         reply_markup=reply_markup_end)
         return
 
@@ -312,6 +358,7 @@ async def set_menu_commands(app: ApplicationBuilder) -> None:
         BotCommand("link", "Записать/перезаписать код психолога"),
         BotCommand("reset", "Сбросить данные"),
         BotCommand("help", "Помощь"),
+        BotCommand("psy", "Для психолога"),
     ]
     await app.bot.set_my_commands(commands)
 
@@ -330,13 +377,41 @@ async def help (update: Update, context: ContextTypes.DEFAULT_TYPE) -> Optional[
         "/link – указать или изменить ссылку на таблицу психолога\n"
         "/reset – сбросить текущую сессию и начать заново\n"
         "/main – вернуться на главный шаг\n"
-        "/help – показать эту справку\n\n"
+        "/help – показать эту справку\n"
+        "/psy – показать данные психолога\n\n"
         "ℹ️ Просто следуйте инструкциям на экране. Если что-то пошло не так — используйте /reset.\n\n"
         "Если вы – психолог, сначала используйте команду /link, чтобы указать таблицу Google Sheets.\n"
         "Если вы – клиент, сначала введите код психолога, затем код вашей пары.\n\n"
         "⚠️ Все данные сохраняются в защищённой таблице Google.\n"
     )
     await update.message.reply_text(text, parse_mode="Markdown", reply_markup=ReplyKeyboardRemove())
+
+async def for_psychologist (update: Update, context: ContextTypes.DEFAULT_TYPE) -> Optional[int]:
+    user_id: int = update.message.from_user.id
+    psycho_row = await get_row_from_psycho_by_uid_db(user_id)
+    if psycho_row is None:
+        await update.message.reply_text('Это данные для аккаунтов психолога  \n\n вы можете так же создать свой аккаунт психолога: /link')
+    else:
+        psychologist_id: str = psycho_row['psychologist_id']
+        credits: str = psycho_row['credits']
+        table: str = psycho_row['table']
+
+        keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton(text=psychologist_id, callback_data="code_copy")]
+        ])
+
+        text = (
+            "*Данные для психолога*\n\n"
+            f"`{psychologist_id}` — ваш код психолога (нажмите, чтобы скопировать)\n\n"
+            f"[Ссылка на таблицу]({table})\n\n"
+            f"Ваши кредиты: *{credits}*\n\n"
+        )
+
+        await update.message.reply_text(
+            text,
+            parse_mode="Markdown",
+            reply_markup=keyboard
+        )
 
 
 def main() -> None:
@@ -369,6 +444,7 @@ def main() -> None:
                    CommandHandler("link", set_table_link),
                    CommandHandler("help", help),
                    CommandHandler("main", start),
+                   CommandHandler("psy", for_psychologist),
                    ],  # ←],
     )
 

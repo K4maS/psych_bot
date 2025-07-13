@@ -1,4 +1,6 @@
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove
+import json
+from config import GOOGLE_CREDENTIALS_JSON
 
 STEP_START, STEP_CODE, STEP_DEVICE,  Q_1, Q_2, Q_3, Q_4, Q_5, Q_6, Q_7, Q_8,STEP_MSG1, STEP_END, STEP_PSYCHO_CODE, STEP_PSYCHO_TABLE = range(15)
 first_question = Q_1
@@ -6,6 +8,10 @@ user_sessions = {}  # user_id: {code, row, device, is_first}
 
 back_action = "Назад"
 reset_action = "Сначала"
+
+with open(GOOGLE_CREDENTIALS_JSON, 'r', encoding='utf-8') as f:
+    google_key = json.load(f)
+
 
 reply_markup = ReplyKeyboardMarkup([["Проблемы пары", "Свои проблемы", "Сначала"]], resize_keyboard=True)
 reply_markup_back_reset = ReplyKeyboardMarkup([[back_action, reset_action]], resize_keyboard=True)
@@ -17,7 +23,7 @@ reply_markup_yes_or_no = ReplyKeyboardMarkup([['Да', 'Нет'],[back_action, r
 
 
 steps = [
-    {'question': '...Пока в данном шаге надо ввести что то, чтобы пройди дальше...', 'reply_markup': ReplyKeyboardRemove(),  'component': STEP_START},
+    {'question': 'Начинаем...', 'reply_markup': ReplyKeyboardRemove(),  'component': STEP_START},
     {'question': 'Введите ваш код консультации:', 'reply_markup': ReplyKeyboardRemove(),  'component': STEP_CODE},
     {'question': 'Подключение успешно. Укажите, какие проблемы вы собираетесь решать:',  'reply_markup': reply_markup , 'component': STEP_DEVICE},
     {'question': 'Ваш пол', 'reply_markup': reply_markup_gender , 'component': Q_1},
@@ -31,5 +37,5 @@ steps = [
     {'question': 'Введите ваше сообщение:', 'component': STEP_MSG1},
     {'question': 'Сессия прошла успешно', 'component': STEP_END},
     {'question': 'Введите код психолога:', 'reply_markup': ReplyKeyboardRemove(),  'component': STEP_PSYCHO_CODE},
-    {'question': 'Здесь психолог должен ввести ссылку на свою таблицу(надо будет сделать валидацию):', 'reply_markup': ReplyKeyboardRemove(),  'component': STEP_PSYCHO_TABLE},
+    {'question': 'Здесь психолог должен ввести ссылку на свою таблицу(надо будет сделать валидацию) и дать доступ для записи аккаунту  ' + google_key["client_email"], 'reply_markup': ReplyKeyboardRemove(),  'component': STEP_PSYCHO_TABLE},
 ]
