@@ -21,6 +21,8 @@ reply_markup_menu = ReplyKeyboardMarkup([['Для психолога', 'Смен
 reply_markup_end = ReplyKeyboardMarkup([[reset_action]], resize_keyboard=True)
 reply_markup_yes_or_no = ReplyKeyboardMarkup([['Да', 'Нет'],[back_action, reset_action]], resize_keyboard=True)
 
+table_link_text = f'*Добавление таблицы психолога* \n 1. Вставить ссылку на таблицу, скопированную с примера таблицы: \n  [Ссылка на пример таблицы](https://docs.google.com/spreadsheets/d/1RbUDgsLz42zSKKMHBShu-INQwGPW1jTWA6-UIfgD3Zo/edit?gid=0#gid=0). \n 2. Дать доступ, для редактирования таблицы, аккаунту бота: {
+    google_key["client_email"]}'
 
 steps = [
     {'question': 'Начинаем...', 'reply_markup': ReplyKeyboardRemove(),  'component': STEP_START},
@@ -37,5 +39,5 @@ steps = [
     {'question': 'Введите ваше сообщение:', 'component': STEP_MSG1},
     {'question': 'Сессия прошла успешно', 'component': STEP_END},
     {'question': 'Введите код психолога:', 'reply_markup': ReplyKeyboardRemove(),  'component': STEP_PSYCHO_CODE},
-    {'question': 'Здесь психолог должен ввести ссылку на свою таблицу(надо будет сделать валидацию) и дать доступ для записи аккаунту  ' + google_key["client_email"], 'reply_markup': ReplyKeyboardRemove(),  'component': STEP_PSYCHO_TABLE},
+    {'question': table_link_text, 'reply_markup': ReplyKeyboardRemove(),  'component': STEP_PSYCHO_TABLE},
 ]

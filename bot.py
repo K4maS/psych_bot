@@ -1,6 +1,6 @@
 import logging
 from typing import Optional, Union
-from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove, BotCommand, InlineKeyboardMarkup, InlineKeyboardButton
+from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove, BotCommand, InlineKeyboardMarkup, InlineKeyboardButton, LabeledPrice
 from telegram.ext import (
     ApplicationBuilder,
     CommandHandler,
@@ -9,7 +9,7 @@ from telegram.ext import (
     ContextTypes,
     ConversationHandler,
 )
-from config import TELEGRAM_BOT_TOKEN
+from config import TELEGRAM_BOT_TOKEN, PROVIDER_TOKEN
 from sheets import *
 from util import (
     create_answers_format,
@@ -355,16 +355,17 @@ async def set_menu_commands(app: ApplicationBuilder) -> None:
     commands = [
         BotCommand("start", "Запустить бота"),
         BotCommand("main", "Главная"),
+        BotCommand("psy", "Для психолога"),
         BotCommand("link", "Записать/перезаписать код психолога"),
+        # BotCommand("pay", "Покупка кредитов"),
         BotCommand("reset", "Сбросить данные"),
         BotCommand("help", "Помощь"),
-        BotCommand("psy", "Для психолога"),
     ]
     await app.bot.set_my_commands(commands)
 
 
 async def set_table_link(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Optional[int]:
-    await update.message.reply_text(steps[STEP_PSYCHO_TABLE]['question'], reply_markup=ReplyKeyboardRemove())
+    await update.message.reply_text(steps[STEP_PSYCHO_TABLE]['question'], reply_markup=ReplyKeyboardRemove(), parse_mode="Markdown")
     context.user_data.clear()
     return global_step_changer(STEP_PSYCHO_TABLE, update, context)
 
@@ -414,6 +415,17 @@ async def for_psychologist (update: Update, context: ContextTypes.DEFAULT_TYPE) 
         )
 
 
+
+async def start_payment(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("💳 Оплатить 100₽", url=YOOMONEY_LINK)]
+    ])
+    await update.message.reply_text(
+        "Для покупки кредитов нажмите кнопку ниже:",
+        reply_markup=keyboard
+    )
+
+
 def main() -> None:
     print("[СТАТУС] Бот запускается...")
     app = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()
@@ -445,6 +457,7 @@ def main() -> None:
                    CommandHandler("help", help),
                    CommandHandler("main", start),
                    CommandHandler("psy", for_psychologist),
+                   # CommandHandler("pay", start_payment),
                    ],  # ←],
     )
 
