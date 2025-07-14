@@ -61,27 +61,41 @@ async def insert_row_to_psycho_db(uid, input_value):
     return await insert_row_to_base(PSYHOLOGIST_TABLE, {"uid": str(uid), **input_value} )
     
 async def joint_table(uid):
-    response = supabase \
-    .from_("patients") \
-    .select("*, psychologist:psychologists(*)") \
-    .eq("uid", uid) \
-    .execute()
-    if response.data:
-        return response.data[0]
+    try:
+        response = supabase \
+            .from_("patients") \
+            .select("*, psychologist:psychologists(*)") \
+            .eq("uid", uid) \
+            .execute()
+        if response.data:
+            return response.data[0]
+        logging.warning(f"[Supabase] Нет данных joint_table для uid={uid}")
+        return None
+    except Exception as e:
+        logging.error(f"[Supabase] Ошибка joint_table: {e}")
+        return None
     
 async def get_psycho_data(uid: int) -> Optional[str]:
     data = await joint_table(uid)
     if not data or not isinstance(data, dict):
         return None
-    return data.get("psychologist", {})
+    psychologist = data.get("psychologist")
+    if not psychologist or not isinstance(psychologist, dict):
+        return None
+    return psychologist
 
 async def get_table_linked_to_psycho(uid: int) -> Optional[str]:
     data = await get_psycho_data(uid)
-    return data.get("table")
+    if data:
+        return data.get("table")
+    return None
 
 async def get_credits_of_psycho(uid: int) -> Optional[str]:
     data = await get_psycho_data(uid)
-    return data.get("credits")
+    if data:
+        credits = data.get("credits")
+        return int(credits) if credits is not None else None
+    return None
 
 
 async def joint_table_upsert(uid):
