@@ -1,17 +1,11 @@
 import httpx
 import logging
-from config import OPENROUTER_API_KEY
+from config import OPENROUTER_API_KEY, MODELS
 from sheets import get_prompt_from_sheet
 
 logging.basicConfig(filename="errors.log", level=logging.ERROR)
 
-MODELS = [
-    # "openai/gpt-4o",
-    # "openai/gpt-3.5-turbo",
-    # "deepseek-ai/deepseek-coder",
-    # "google/gemini-pro",
-    "mistralai/mistral-7b-instruct",
-]
+
 
 API_URL = "https://openrouter.ai/api/v1/chat/completions"
 HEADERS = {
