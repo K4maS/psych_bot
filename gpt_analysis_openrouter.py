@@ -5,7 +5,10 @@ from sheets import get_prompt_from_sheet
 
 logging.basicConfig(filename="errors.log", level=logging.ERROR)
 
-
+if MODELS is None:
+    MODELS = [
+        "mistralai/mistral-7b-instruct",
+    ]
 
 API_URL = "https://openrouter.ai/api/v1/chat/completions"
 HEADERS = {

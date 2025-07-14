@@ -26,7 +26,7 @@ table_link_text = f'*Добавление таблицы психолога* \n 
 
 steps = [
     {'question': 'Начинаем...', 'reply_markup': ReplyKeyboardRemove(),  'component': STEP_START},
-    {'question': 'Введите ваш код консультации:', 'reply_markup': ReplyKeyboardRemove(),  'component': STEP_CODE},
+    {'question': 'Введите ваш код пациента:', 'reply_markup': ReplyKeyboardRemove(),  'component': STEP_CODE},
     {'question': 'Подключение успешно. Укажите, какие проблемы вы собираетесь решать:',  'reply_markup': reply_markup , 'component': STEP_DEVICE},
     {'question': 'Ваш пол', 'reply_markup': reply_markup_gender , 'component': Q_1},
     {'question': 'Сколько Вам лет?', 'component': Q_2},

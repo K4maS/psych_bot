@@ -70,7 +70,7 @@ async def psych_set_table_link(update: Update, context: ContextTypes.DEFAULT_TYP
         return global_step_changer(steps[STEP_PSYCHO_TABLE]['component'], update, context)
 
     try:
-        row = await insert_row_to_psycho_db(user_id, {'name': username, 'table': link, 'credits': 1})
+        row = await insert_row_to_psycho_db(user_id, {'name': username, 'table': link})
         psycho_row = await get_row_from_psycho_by_uid_db(user_id)
 
         if row is None:
@@ -102,7 +102,7 @@ async def get_psycho_code(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         await update.message.reply_text("Код психолога не найден. Пожалуйста, введите правильный код.")
     else:
         await insert_row_to_patients_db(user_id, {"psychologist_id": code, "name": username})
-        await update.message.reply_text("Код психолога принят. Теперь введите код вашей пары:",
+        await update.message.reply_text("Код психолога принят. Теперь введите код пациента:",
                                         reply_markup=ReplyKeyboardRemove())
         print(f"[BOT] Код {code} принят, строка {row}")
 
@@ -382,7 +382,7 @@ async def help (update: Update, context: ContextTypes.DEFAULT_TYPE) -> Optional[
         "/psy – показать данные психолога\n\n"
         "ℹ️ Просто следуйте инструкциям на экране. Если что-то пошло не так — используйте /reset.\n\n"
         "Если вы – психолог, сначала используйте команду /link, чтобы указать таблицу Google Sheets.\n"
-        "Если вы – клиент, сначала введите код психолога, затем код вашей пары.\n\n"
+        "Если вы – клиент, сначала введите код психолога, затем код пациента.\n\n"
         "⚠️ Все данные сохраняются в защищённой таблице Google.\n"
     )
     await update.message.reply_text(text, parse_mode="Markdown", reply_markup=ReplyKeyboardRemove())
